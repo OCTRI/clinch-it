@@ -1,0 +1,24 @@
+		</main>
+		
+		<footer class='footer'>	
+			<div id="footerContainer" class="container">
+				<hr/>
+				<p id='appVersion' class='text-right text-muted small'>
+					{{appName}} {{appVersion}}
+				</p>
+				<div id='logos' class='text-center'>
+					<img src="{{req.contextPath}}/assets/img/OCTRI_logo.png" class="img-fluid">					
+				</div>				
+			</div>
+		</footer>
+				<script type="text/javascript"
+			src="{{req.contextPath}}/webjars/jquery/jquery.min.js"></script>
+		<script type="text/javascript"
+			src="{{req.contextPath}}/webjars/bootstrap/js/bootstrap.bundle.min.js"></script>
+		
+		{{#pageScripts}}
+		  {{! Page-specific scripts can be specified in the view model }}
+		  <script type="text/javascript" src="{{req.contextPath}}/assets/js/{{.}}.js"></script>
+		{{/pageScripts}}
+	</body>
+</html>

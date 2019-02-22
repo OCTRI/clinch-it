@@ -1,0 +1,21 @@
+# Local default environment overrides, useful for development environments
+version: "2"
+services:
+  app:
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql/clinch-it
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - ./docker_data/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=clinch-it
+      - MYSQL_USER=clinch-it
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD

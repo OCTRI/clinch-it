@@ -1,0 +1,37 @@
+pipeline {
+  agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+  environment {
+    SERVER_NAME = 'octriweb01.acc.ohsu.edu'
+    SERVER_PATH = '/usr/local/project-clinch-it'
+  }
+  parameters {
+    string(name: 'VERSION', description: 'The version to deploy.')
+  }
+  stages {
+    stage('Check Parameters') {
+      steps {
+        deleteDir()
+        checkParams(params)
+      }
+    }
+    stage('Deploy') {
+      steps {
+        downloadArtifact('clinch-it', params.VERSION)
+        sh 'mv *.jar clinch-it.jar'
+        sshagent(['jenkins-ssh']) {
+          sh """
+          scp clinch-it.jar jenkins@${SERVER_NAME}:${SERVER_PATH}/clinch-it.jar
+          ssh jenkins@$SERVER_NAME /bin/bash <<EOF
+            /etc/init.d/project-clinch-it stop
+            sleep 20
+            /etc/init.d/project-clinch-it start
+EOF
+"""
+        }
+      }
+    }
+  }
+}

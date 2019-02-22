@@ -1,0 +1,11 @@
+
+{{>components/form_start}}
+{{#entity}}
+	
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input class='form-control' type='text' name='description' value='{{#description}}{{.}}{{/description}}'  />
+    </div>
+
+{{/entity}}
+{{>components/form_end}}

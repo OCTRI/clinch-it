@@ -1,0 +1,15 @@
+# Base configuration
+# Keys without a value are passed into the config via a .env file in the same
+# directory as the `docker-compose` command was run from
+version: "2"
+services:
+  app:
+    image: octri.ohsu.edu/jarrunner:2018q3.1
+    volumes:
+      - ./target/clinch-it.jar:/app.jar
+    environment:
+      - SERVER_SERVLET_CONTEXTPATH
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      

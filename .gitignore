@@ -1,0 +1,37 @@
+# Docker
+docker_data
+.env
+
+### Eclipse ###
+.metadata
+bin/
+tmp/
+.settings/
+.loadpath
+
+# Eclipse Core
+.project
+.factorypath
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# sbteclipse plugin
+.target
+
+# STS (Spring Tool Suite)
+.springBeans
+
+### OSX ###
+.DS_Store
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
