@@ -5,8 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import org.octri.clinchit.view.Labelled;
-
 /**
  * Summarizes the assessment of a patient for a given SdhDomain - the patient readiness,
  * clinician priority, and assessment date.

@@ -57,3 +57,20 @@ footer img.last-item {
 .collapse-row.collapsed + tr {
      display: none;
 }
+
+td.table-danger {
+	color: #dc3545;
+	background-color:inherit;
+}
+
+td.table-warning {
+	color: #ffc107;
+	background-color:inherit;
+}
+
+td.table-success {
+	color: #28a745;
+	background-color:inherit;
+}
+
+

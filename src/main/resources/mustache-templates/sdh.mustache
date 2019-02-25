@@ -1,12 +1,17 @@
 {{>layout/header}}
 
 <div class="container vertical-space">
-	<h1>Social Determinants of Health</h1>
-	
+	{{#patient}}
+		<h3>Patient Info</h3> 
+		Name: {{#name}}{{.}}{{/name}}<br>
+		Date of Birth: {{#dateOfBirth}}{{.}}{{/dateOfBirth}}<br>		
+	{{/patient}}
+	<br>
+	<h3>Social Determinants of Health (static)</h3>	
 	<table class="table">
     	<thead class="thead-dark">
     		<tr>
-    			<th></th>
+    			<th>Domain</th>
     			<th>Date Last Assessed</th>
     			<th>Clinician Priority</th>
     			<th>Patient Readiness</th>
@@ -80,8 +85,67 @@
                 	<div id="collapseThree" class="collapse">Questions Related to Housing Instability</div>
             	</td>
         	</tr>
+     		<tr data-toggle="collapse" data-target="#collapseFour" class="clickable collapse-row collapsed">
+   				<td><i class="fas fa-angle-right"></i> Utilities</td>
+    			<td>12/16/2018</td>
+    			<td class="text-warning">Medium</td>
+    			<td class="text-success">Not Ready</td>
+    		</tr>
+    		<tr>
+            	<td colspan="4">
+                	<div id="collapseFour" class="collapse">Questions Related to Utilities</div>
+            	</td>
+        	</tr>
+     		<tr data-toggle="collapse" data-target="#collapseFive" class="clickable collapse-row collapsed">
+   				<td><i class="fas fa-angle-right"></i> Interpersonal Violence</td>
+    			<td>04/02/2017</td>
+    			<td class="text-warning">Low</td>
+    			<td class="text-success">Motivated</td>
+    		</tr>
+    		<tr>
+            	<td colspan="4">
+                	<div id="collapseFive" class="collapse">Questions Related to Interpersonal Violence</div>
+            	</td>
+        	</tr>
+     		<tr data-toggle="collapse" data-target="#collapseSix" class="clickable collapse-row collapsed">
+   				<td><i class="fas fa-angle-right"></i> Education</td>
+    			<td>11/19/2018</td>
+    			<td class="text-warning">Medium</td>
+    			<td class="text-success">Ready</td>
+    		</tr>
+    		<tr>
+            	<td colspan="4">
+                	<div id="collapseSix" class="collapse">Questions Related to Education</div>
+            	</td>
+        	</tr>
+     		<tr data-toggle="collapse" data-target="#collapseSeven" class="clickable collapse-row collapsed">
+   				<td><i class="fas fa-angle-right"></i> Financial Strain</td>
+    			<td>11/19/2018</td>
+    			<td class="text-warning">Low</td>
+    			<td class="text-success">Ready</td>
+    		</tr>
+    		<tr>
+            	<td colspan="4">
+                	<div id="collapseSeven" class="collapse">Questions Related to Financial Strain</div>
+            	</td>
+        	</tr>
     	</tbody>
 	</table>	
 
 </div>
+
+<br>
+
+<h3>Social Determinants of Health (Vue)</h3>	
+	
+<div id="contents">
+	<b-table show-empty head-variant="dark" :items="emphasized" :fields="fields">
+	  <template slot="top-row" slot-scope="{ fields }">
+	    <td v-for="field in fields" :key="field.key">
+	      <input v-model="filters[field.key]" :placeholder="field.label">
+	    </td>
+	  </template>
+	</b-table>
+</div>
+
 {{>layout/footer}}
