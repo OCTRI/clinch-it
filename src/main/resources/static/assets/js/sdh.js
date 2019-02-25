@@ -56,10 +56,10 @@
 		    	const { filtered, _priorityVariant, _readinessVariant } = this;
 		    	const emphasized = this.filtered.map(item => {
 		    		let tmp=item;
-	                let clinicianPriorityEmphasis = _priorityVariant(item.clinician_priority)
-	                let patientReadinessEmphasis = _readinessVariant(item.patient_readiness)
-	                tmp._cellVariants = {'clinician_priority': clinicianPriorityEmphasis, 'patient_readiness': patientReadinessEmphasis};
-	                return tmp;	
+		    		let clinicianPriorityEmphasis = _priorityVariant(item.clinician_priority);
+		    		let patientReadinessEmphasis = _readinessVariant(item.patient_readiness);
+		    		tmp._cellVariants = {'clinician_priority': clinicianPriorityEmphasis, 'patient_readiness': patientReadinessEmphasis};
+		    		return tmp;
 		    	});
 		    	return emphasized;
 		    }
