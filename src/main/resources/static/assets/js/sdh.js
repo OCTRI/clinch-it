@@ -1,5 +1,5 @@
 (function() {
-	var app = new Vue({
+	new Vue({
 		el: '#contents',
 		data: {
 			fields: [{key:'domain', sortable:true}, {key:'date_last_assessed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}],
@@ -21,21 +21,25 @@
 		},
 		methods: {
 			_priorityVariant (priority) {
-				if (priority == 'High') {
+				if (priority === 'High') {
 					return 'danger';
-				} else if (priority == 'Medium') {
+				} else if (priority === 'Medium') {
 					return 'warning';
-				} else if (priority == 'Low') {
+				} else if (priority === 'Low') {
 					return 'success';
+				} else {
+					return '';
 				}
 		    },			
 			_readinessVariant (readiness) {
-				if (readiness == 'Not Ready') {
+				if (readiness === 'Not Ready') {
 					return 'danger';
-				} else if (readiness == 'Motivated') {
+				} else if (readiness === 'Motivated') {
 					return 'warning';
-				} else if (readiness == 'Ready') {
+				} else if (readiness === 'Ready') {
 					return 'success';
+				} else {
+					return '';
 				}
 		    }			
 		},
@@ -43,7 +47,7 @@
 		    filtered () {
 		        const filtered = this.items.filter(item => {
 		          return Object.keys(this.filters).every(key =>
-		              String(item[key].toLowerCase()).includes(this.filters[key].toLowerCase()));
+		              item[key].toLowerCase().includes(this.filters[key].toLowerCase()));
 		        });
 		        return filtered.length > 0 ? filtered : [{
 		          domain: '',
@@ -54,11 +58,12 @@
 		    },
 		    emphasized () {
 		    	const { filtered, _priorityVariant, _readinessVariant } = this;
-		    	const emphasized = this.filtered.map(item => {
-		    		let tmp=item;
-		    		let clinicianPriorityEmphasis = _priorityVariant(item.clinician_priority);
-		    		let patientReadinessEmphasis = _readinessVariant(item.patient_readiness);
-		    		tmp._cellVariants = {'clinician_priority': clinicianPriorityEmphasis, 'patient_readiness': patientReadinessEmphasis};
+		    	const emphasized = filtered.map(item => {
+		    		let tmp = Object.assign({}, item);
+		    		tmp._cellVariants = {
+		    			'clinician_priority': _priorityVariant(item.clinician_priority), 
+		    			'patient_readiness': _readinessVariant(item.patient_readiness)
+		    		};
 		    		return tmp;
 		    	});
 		    	return emphasized;
