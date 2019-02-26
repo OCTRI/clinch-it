@@ -1,0 +1,32 @@
+
+{{>layout/header}}
+<div class="container">
+
+	<h1>{{entityName}}</h1>
+	{{>components/messages}}
+	<div>
+		{{#entity}}
+			
+		<h5>Name</h5> 
+		<p>
+			{{#name}}{{.}}{{/name}}
+			{{^name}}<span class='text-muted'>None</span>{{/name}}
+		</p>
+
+			
+		<h5>Date of birth</h5> 
+		<p>
+			{{#dateOfBirth}}{{.}}{{/dateOfBirth}}
+			{{^dateOfBirth}}<span class='text-muted'>None</span>{{/dateOfBirth}}
+		</p>
+		
+		<div class="row">
+			<a href="{{req.contextPath}}{{baseRoute}}/{{id}}/sdh" class="btn btn-primary">Social Determinants of Health</a>
+		</div>
+	
+		{{>components/show_links}}
+		
+		{{/entity}}
+	</div>
+</div>
+{{>layout/footer}}
