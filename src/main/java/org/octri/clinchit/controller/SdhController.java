@@ -19,6 +19,12 @@ public class SdhController {
 	@Autowired
 	PatientRepository patientRepository;
 	
+	/**
+	 * Show the Vue mockup
+	 * @param model
+	 * @param id
+	 * @return
+	 */
 	@GetMapping("patient/{id}/sdh")
 	public ModelAndView sdh(Map<String, Object> model, @PathVariable Long id) {
 
@@ -26,6 +32,20 @@ public class SdhController {
 		model.put("patient", patient);
 		model.put("pageScripts", new String[] {"sdh"});
 		return new ModelAndView("sdh", model);
+	}
+
+	/**
+	 * Show the static mockup
+	 * @param model
+	 * @param id
+	 * @return
+	 */
+	@GetMapping("patient/{id}/sdh-mockup")
+	public ModelAndView sdhMockup(Map<String, Object> model, @PathVariable Long id) {
+
+		Patient patient = patientRepository.findById(id).get();
+		model.put("patient", patient);
+		return new ModelAndView("sdh-mockup", model);
 	}
 
 }

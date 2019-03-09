@@ -2,7 +2,7 @@
 	new Vue({
 		el: '#contents',
 		data: {
-			fields: [{key:'domain', sortable:true}, {key:'date_last_assessed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}],
+			fields: [ 'show_details', {key:'domain', sortable:true}, {key:'date_last_assessed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}],
 			filters: {
 			      domain: '',
 			      date_last_assessed: '',
@@ -10,7 +10,7 @@
 			      patient_readiness: ''
 			    },
 	        items: [
-	            { domain: 'Food Security', date_last_assessed: '01/01/2018', clinician_priority: 'High', patient_readiness: 'Not Ready' },
+	            { domain: 'Food Security', date_last_assessed: '01/01/2018', clinician_priority: 'Medium', patient_readiness: 'Not Ready' },
 	            { domain: 'Transportation', date_last_assessed: '01/01/2019', clinician_priority: 'Low', patient_readiness: 'Motivated'},
 	            { domain: 'Housing Instability', date_last_assessed: '10/11/2018', clinician_priority: 'Medium', patient_readiness: 'Ready' },
 	            { domain: 'Utilities', date_last_assessed: '02/01/2019', clinician_priority: 'High', patient_readiness: 'Ready' },
@@ -60,6 +60,7 @@
 		    	const { filtered, _priorityVariant, _readinessVariant } = this;
 		    	const emphasized = filtered.map(item => {
 		    		let tmp = Object.assign({}, item);
+		    		tmp._showDetails = false; // Trigger row details with everything closed
 		    		tmp._cellVariants = {
 		    			'clinician_priority': _priorityVariant(item.clinician_priority), 
 		    			'patient_readiness': _readinessVariant(item.patient_readiness)
