@@ -73,4 +73,10 @@ td.table-success {
 	background-color:inherit;
 }
 
+.summary-list {
+	list-style: none;
+    padding-left: 0;
+    margin-bottom: 30px;
+}
+
 

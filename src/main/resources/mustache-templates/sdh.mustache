@@ -1,13 +1,15 @@
 {{>layout/header}}
 
 <div class="container vertical-space">
+	<div class="float-right"><a href="#" class="btn btn-primary"><i class="fas fa-envelope"></i> Send Message</a></div>		
 	{{#patient}}
-		<div class="float-right"><a href="#" class="btn btn-primary"><i class="fas fa-envelope"></i> Send Message</a></div>		
 		<h3>Patient Info</h3> 
-		Name: <a href="{{req.contextPath}}/patient/{{#id}}{{.}}{{/id}}">{{#name}}{{.}}{{/name}}</a><br>
-		Date of Birth: {{#dateOfBirth}}{{.}}{{/dateOfBirth}}<br>
+		<ul class="summary-list">
+			<li>Name: <a href="{{req.contextPath}}/patient/{{#id}}{{.}}{{/id}}">{{#name}}{{.}}{{/name}}</a></li>
+			<li>Date of Birth: {{#dateOfBirth}}{{.}}{{/dateOfBirth}}</li>
+		</ul>
 	{{/patient}}
-	<br>
+
 	
 	<h3>Social Determinants of Health</h3>
 	
@@ -52,10 +54,10 @@
 	             		</table>                	
     				</b-tab>
     				<b-tab title="Historic Questionnaire Response">
-						<br><p>This might be a clickable list of dates or the menu item might be a dropdown.</p>
+						<p>This might be a clickable list of dates or the menu item might be a dropdown.</p>
     				</b-tab>
     				<b-tab title="New Questionnaire Response" >
-						<br><p>Fill out a new response.</p>
+						<p>Fill out a new response.</p>
     				</b-tab>
   				</b-tabs>
               </div>
