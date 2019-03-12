@@ -17,8 +17,8 @@
 		<b-table show-empty head-variant="dark" :items="emphasized" :fields="fields">
 		  <template slot="top-row" slot-scope="{ fields }">
 		    <td v-for="field in fields" :key="field.key">
-		      <span v-if="field.key === 'show_details'" >Filter By:</span>
-		      <input v-if="field.key !== 'show_details'" v-model="filters[field.key]" :placeholder="field.label">
+		      <span v-if="isShowDetails(field)" >Filter By:</span>
+		      <input v-else v-model="filters[field.key]" :placeholder="field.label">
 		    </td>
 		  </template>
      	  <template slot="show_details" slot-scope="row">

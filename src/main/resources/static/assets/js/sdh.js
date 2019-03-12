@@ -41,7 +41,10 @@
 				} else {
 					return '';
 				}
-		    }			
+		    },
+		    isShowDetails(field) {
+		    	return field.key === 'show_details';
+		    }
 		},
 		computed: {
 		    filtered () {
