@@ -4,27 +4,51 @@
 
 	<h1>{{entityName}}</h1>
 	{{>components/messages}}
-	<div>
+	<div class="row">
 		{{#entity}}
-			
-		<h5>Name</h5> 
-		<p>
-			{{#name}}{{.}}{{/name}}
-			{{^name}}<span class='text-muted'>None</span>{{/name}}
-		</p>
-
-			
-		<h5>Date of birth</h5> 
-		<p>
-			{{#dateOfBirth}}{{.}}{{/dateOfBirth}}
-			{{^dateOfBirth}}<span class='text-muted'>None</span>{{/dateOfBirth}}
-		</p>
-		
-		<div class="row">
-			<a href="{{req.contextPath}}{{baseRoute}}/{{id}}/sdh" class="btn btn-primary">Social Determinants of Health</a>
+		<div class="col-sm-6">
+			<div class="card">	
+				<div class="card-header">
+					{{#name}}{{.}}{{/name}}
+				</div>
+				<div class="card-body small">
+					<h5>Demographics</h5> 
+					<ul>
+						<li>Date of Birth: {{#dateOfBirth}}{{.}}{{/dateOfBirth}}</li>
+						<li>...Other relevant info</li>
+					</ul>
+				</div>
+			</div>
 		</div>
-	
-		{{>components/show_links}}
+		
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-header">
+					Social Determinants of Health
+				</div>
+				
+				<div class="card-body small">
+					<div class = "row">
+						<div class="col-sm-6">
+							<h5><i class="fas fa-utensils"></i> Food Security</h5>
+							<ul>
+								<li>Last Assessment: 02/01/2019</li>
+								<li>Clinician Priority: High</li>
+							</ul>
+							<h5><i class="fas fa-bus"></i> Transportation</h5>
+							<ul>
+								<li>Last Assessment: 01/01/2019</li>
+								<li>Clinician Priority: Low</li>
+							</ul>
+						</div>
+						<div class="col-sm-2"></div>
+						<div class="col-sm-4">
+							<a href="{{req.contextPath}}{{baseRoute}}/{{id}}/sdh" class="btn btn-primary">View Dashboard</a>
+						</div>
+					</div>					
+				</div>
+			</div>
+		</div>
 		
 		{{/entity}}
 	</div>
