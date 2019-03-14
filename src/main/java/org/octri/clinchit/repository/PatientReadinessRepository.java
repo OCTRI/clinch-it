@@ -5,7 +5,7 @@ import org.octri.clinchit.domain.PatientReadiness;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(itemResourceRel = "api", path = "patient_readiness")
+@RepositoryRestResource(path = "patient_readiness")
 public interface PatientReadinessRepository extends PagingAndSortingRepository<PatientReadiness, Long> {
 
 }

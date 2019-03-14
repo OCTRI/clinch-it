@@ -5,7 +5,7 @@ import org.octri.clinchit.domain.ClinicianPriority;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(itemResourceRel = "api", path = "clinician_priority")
+@RepositoryRestResource(path = "clinician_priority")
 public interface ClinicianPriorityRepository extends PagingAndSortingRepository<ClinicianPriority, Long> {
 
 }
