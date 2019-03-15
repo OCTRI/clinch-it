@@ -1,0 +1,41 @@
+
+{{>layout/header}}
+<div class="container">
+
+	<h1>{{entityName}}</h1>
+	{{>components/messages}}
+	<div>
+		{{#entity}}
+			
+		<h5>Patient</h5> 
+		<p>
+			{{#patient}}{{patient.label}}{{/patient}}
+			{{^patient}}<span class='text-muted'>None</span>{{/patient}}
+		</p>
+
+			
+		<h5>Domain</h5> 
+		<p>
+			{{#domain}}{{domain.label}}{{/domain}}
+			{{^domain}}<span class='text-muted'>None</span>{{/domain}}
+		</p>
+
+			
+		<h5>Clinician priority</h5> 
+		<p>
+			{{#clinicianPriority}}{{clinicianPriority.label}}{{/clinicianPriority}}
+			{{^clinicianPriority}}<span class='text-muted'>None</span>{{/clinicianPriority}}
+		</p>
+
+			
+		<h5>Patient readiness</h5> 
+		<p>
+			{{#patientReadiness}}{{patientReadiness.label}}{{/patientReadiness}}
+			{{^patientReadiness}}<span class='text-muted'>None</span>{{/patientReadiness}}
+		</p>
+
+			{{>components/show_links}}
+		{{/entity}}
+	</div>
+</div>
+{{>layout/footer}}

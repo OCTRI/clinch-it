@@ -1,17 +1,16 @@
 
 package org.octri.clinchit.controller;
 
+import java.util.Map;
+
 import org.octri.clinchit.domain.PatientDomainAssessment;
 import org.octri.clinchit.repository.PatientDomainAssessmentRepository;
 import org.octri.clinchit.repository.PatientRepository;
 import org.octri.clinchit.repository.SdhDomainRepository;
-import org.octri.clinchit.repository.ClinicianPriorityRepository;
-import org.octri.clinchit.repository.PatientReadinessRepository;
 import org.octri.clinchit.view.OptionList;
-import java.util.Map;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -27,10 +26,6 @@ public class PatientDomainAssessmentController extends AbstractEntityController<
 	private PatientRepository patientRepository;
 	@Autowired
 	private SdhDomainRepository domainRepository;
-	@Autowired
-	private ClinicianPriorityRepository clinicianPriorityRepository;
-	@Autowired
-	private PatientReadinessRepository patientReadinessRepository;
 
 	@Override
 	public String newEntity(Map<String, Object> model) {
@@ -41,10 +36,6 @@ public class PatientDomainAssessmentController extends AbstractEntityController<
 			OptionList.fromSearch(patientRepository.findAll(), null));
 		model.put("domainOptions", 
 			OptionList.fromSearch(domainRepository.findAll(), null));
-		model.put("clinicianPriorityOptions", 
-			OptionList.fromSearch(clinicianPriorityRepository.findAll(), null));
-		model.put("patientReadinessOptions", 
-			OptionList.fromSearch(patientReadinessRepository.findAll(), null));
 		return template;
 	}
 
@@ -59,10 +50,6 @@ public class PatientDomainAssessmentController extends AbstractEntityController<
 			OptionList.fromSearch(patientRepository.findAll(), entity.getPatient()));
 		model.put("domainOptions", 
 			OptionList.fromSearch(domainRepository.findAll(), entity.getDomain()));
-		model.put("clinicianPriorityOptions", 
-			OptionList.fromSearch(clinicianPriorityRepository.findAll(), entity.getClinicianPriority()));
-		model.put("patientReadinessOptions", 
-			OptionList.fromSearch(patientReadinessRepository.findAll(), entity.getPatientReadiness()));
 		return template;
 	}
 

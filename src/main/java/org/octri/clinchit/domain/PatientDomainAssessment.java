@@ -1,6 +1,5 @@
 package org.octri.clinchit.domain;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -27,15 +26,6 @@ public class PatientDomainAssessment extends AbstractEntity {
 	
 	// Date? Or use updatedAt?
 	
-	@ManyToOne
-	private ClinicianPriority clinicianPriority;
-	
-	@ManyToOne
-	private PatientReadiness patientReadiness;
-	
-	@Column(columnDefinition = "TEXT DEFAULT NULL")
-	private String clinicianNotes;
-
 	public Patient getPatient() {
 		return patient;
 	}
@@ -50,30 +40,6 @@ public class PatientDomainAssessment extends AbstractEntity {
 
 	public void setDomain(SdhDomain domain) {
 		this.domain = domain;
-	}
-
-	public ClinicianPriority getClinicianPriority() {
-		return clinicianPriority;
-	}
-
-	public void setClinicianPriority(ClinicianPriority clinicianPriority) {
-		this.clinicianPriority = clinicianPriority;
-	}
-
-	public PatientReadiness getPatientReadiness() {
-		return patientReadiness;
-	}
-
-	public void setPatientReadiness(PatientReadiness patientReadiness) {
-		this.patientReadiness = patientReadiness;
-	}
-
-	public String getClinicianNotes() {
-		return clinicianNotes;
-	}
-
-	public void setClinicianNotes(String clinicianNotes) {
-		this.clinicianNotes = clinicianNotes;
 	}
 
 }
