@@ -9,15 +9,14 @@
 			<li>Date of Birth: {{#dateOfBirth}}{{.}}{{/dateOfBirth}}</li>
 		</ul>
 	{{/patient}}
-
-	
+		
 	<h3>Social Determinants of Health</h3>
 	
-	<div id="contents">
+	<div id="contents" data-patient-id="{{#patient}}{{id}}{{/patient}}" data-context-path="{{req.contextPath}}">
 		<b-table show-empty head-variant="dark" :items="emphasized" :fields="fields">
 		  <template slot="top-row" slot-scope="{ fields }">
 		    <td v-for="field in fields" :key="field.key">
-		      <span v-if="isShowDetails(field)" >Filter By:</span>
+		      <span v-if="_isShowDetails(field)" >Filter By:</span>
 		      <input v-else v-model="filters[field.key]" :placeholder="field.label">
 		    </td>
 		  </template>

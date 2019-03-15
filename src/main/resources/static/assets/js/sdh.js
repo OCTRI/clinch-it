@@ -9,15 +9,44 @@
 			      clinician_priority: '',
 			      patient_readiness: ''
 			    },
-	        items: [
-	            { domain: 'Food Security', date_last_assessed: '02/01/2019', clinician_priority: 'High', patient_readiness: 'Not Ready' },
-	            { domain: 'Transportation', date_last_assessed: '01/01/2019', clinician_priority: 'Low', patient_readiness: 'Motivated'},
-	            { domain: 'Housing Instability', date_last_assessed: '10/11/2018', clinician_priority: 'Medium', patient_readiness: 'Ready' },
-	            { domain: 'Utilities', date_last_assessed: '02/01/2019', clinician_priority: 'High', patient_readiness: 'Ready' },
-	            { domain: 'Interpersonal Violence', date_last_assessed: '12/01/2018', clinician_priority: 'Medium', patient_readiness: 'Motivated' },
-	            { domain: 'Education', date_last_assessed: '04/04/2018', clinician_priority: 'Medium', patient_readiness: 'Not Ready' },
-	            { domain: 'Financial Strain', date_last_assessed: '03/17/2012', clinician_priority: 'Low', patient_readiness: 'Ready' }
-	          ]
+	        domainOptions: [],
+	        priorityOptions: [],
+	        readinessOptions: [],
+	        reviews: []
+			    
+		},
+		mounted: function() {
+			const patient = this.$el.getAttribute('data-patient-id');
+			const contextPath = this.$el.getAttribute('data-context-path');
+			let _this = this;
+			$.ajax({
+				url: contextPath + '/api/sdh_domain/',
+				contentType: 'application/json',
+				success: function (data) {
+					_this.domainOptions = data._embedded.sdhDomains;
+				}
+			});
+			$.ajax({
+				url: contextPath + '/api/clinician_priority/',
+				contentType: 'application/json',
+				success: function (data) {
+					_this.priorityOptions = data._embedded.clinicianPriorities;
+				}
+			});
+			$.ajax({
+				url: contextPath + '/api/patient_readiness/',
+				contentType: 'application/json',
+				success: function (data) {
+					_this.readinessOptions = data._embedded.patientReadiness;
+				}
+			});
+			$.ajax({
+				url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
+				contentType: 'application/json',
+				success: function (data) {
+					_this.reviews = data._embedded.clinicianReviews;
+				}
+			});
 		},
 		methods: {
 			_priorityVariant (priority) {
@@ -42,13 +71,29 @@
 					return '';
 				}
 		    },
-		    isShowDetails(field) {
+		    _isShowDetails(field) {
 		    	return field.key === 'show_details';
+		    },
+		    _formatDate(dateString) {
+		    	return dateString.replace(/ \d\d:\d\d:\d\d\.\d/, '');
 		    }
 		},
 		computed: {
+			clinicianReviewSummary () {				
+				return this.domainOptions.map( domain => {
+					let reviewForDomain = this.reviews.filter( review => {
+						return review.domain === domain.description;
+					});
+					if (reviewForDomain.length == 0) {
+						return {'domain': domain.description, 'date_last_assessed': 'NA', 'clinician_priority':'None', 'patient_readiness': 'None'};
+					} else {
+						let onlyReview = reviewForDomain[0];
+						return {'domain': domain.description, 'date_last_assessed': this._formatDate(onlyReview.updatedAt), 'clinician_priority': onlyReview.clinicianPriority, 'patient_readiness': onlyReview.patientReadiness};						
+					}
+				});
+			},
 		    filtered () {
-		        const filtered = this.items.filter(item => {
+		        const filtered = this.clinicianReviewSummary.filter(item => {
 		          return Object.keys(this.filters).every(key =>
 		              item[key].toLowerCase().includes(this.filters[key].toLowerCase()));
 		        });
