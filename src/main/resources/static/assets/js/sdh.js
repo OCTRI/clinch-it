@@ -15,7 +15,7 @@
 	        reviews: []
 			    
 		},
-		mounted: function() {
+		mounted() {
 			const patient = this.$el.getAttribute('data-patient-id');
 			const contextPath = this.$el.getAttribute('data-context-path');
 			$.ajax({
@@ -84,10 +84,10 @@
 						return review.domain === domain.description;
 					});
 					if (reviewForDomain.length === 0) {
-						return {'domain': domain.description, 'date_last_reviewed': 'NA', 'clinician_priority':'None', 'patient_readiness': 'None'};
+						return {domain: domain.description, date_last_reviewed: 'NA', clinician_priority:'None', patient_readiness: 'None'};
 					} else {
 						let review = reviewForDomain[0]; // Unique constraint prevents more than one
-						return {'domain': domain.description, 'date_last_reviewed': this._formatDate(review.updatedAt), 'clinician_priority': review.clinicianPriority, 'patient_readiness': review.patientReadiness};						
+						return {domain: domain.description, date_last_reviewed: this._formatDate(review.updatedAt), clinician_priority: review.clinicianPriority, patient_readiness: review.patientReadiness};						
 					}
 				});
 			},
@@ -109,8 +109,8 @@
 		    		let tmp = Object.assign({}, item);
 		    		tmp._showDetails = false; // Trigger row details with everything closed
 		    		tmp._cellVariants = {
-		    			'clinician_priority': _priorityVariant(item.clinician_priority), 
-		    			'patient_readiness': _readinessVariant(item.patient_readiness)
+		    			clinician_priority: _priorityVariant(item.clinician_priority), 
+		    			patient_readiness: _readinessVariant(item.patient_readiness)
 		    		};
 		    		return tmp;
 		    	});
