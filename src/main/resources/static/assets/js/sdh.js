@@ -87,8 +87,8 @@
 					if (reviewForDomain.length == 0) {
 						return {'domain': domain.description, 'date_last_reviewed': 'NA', 'clinician_priority':'None', 'patient_readiness': 'None'};
 					} else {
-						let onlyReview = reviewForDomain[0];
-						return {'domain': domain.description, 'date_last_reviewed': this._formatDate(onlyReview.updatedAt), 'clinician_priority': onlyReview.clinicianPriority, 'patient_readiness': onlyReview.patientReadiness};						
+						let review = reviewForDomain[0]; // Unique constraint prevents more than one
+						return {'domain': domain.description, 'date_last_reviewed': this._formatDate(review.updatedAt), 'clinician_priority': review.clinicianPriority, 'patient_readiness': review.patientReadiness};						
 					}
 				});
 			},

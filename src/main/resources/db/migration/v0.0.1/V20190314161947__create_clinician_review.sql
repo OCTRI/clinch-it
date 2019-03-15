@@ -13,6 +13,7 @@ CREATE TABLE `clinician_review` (
 	CONSTRAINT clinician_review_patient_fk FOREIGN KEY (`patient`) REFERENCES `patient` (`id`),
 	CONSTRAINT clinician_review_domain_fk FOREIGN KEY (`domain`) REFERENCES `sdh_domain` (`id`),
 	CONSTRAINT clinician_review_clinician_priority_fk FOREIGN KEY (`clinician_priority`) REFERENCES `clinician_priority` (`id`),
-	CONSTRAINT clinician_review_patient_readiness_fk FOREIGN KEY (`patient_readiness`) REFERENCES `patient_readiness` (`id`)
+	CONSTRAINT clinician_review_patient_readiness_fk FOREIGN KEY (`patient_readiness`) REFERENCES `patient_readiness` (`id`),
+	UNIQUE(patient,domain)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
