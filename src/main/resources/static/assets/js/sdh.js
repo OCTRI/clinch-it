@@ -18,33 +18,32 @@
 		mounted: function() {
 			const patient = this.$el.getAttribute('data-patient-id');
 			const contextPath = this.$el.getAttribute('data-context-path');
-			let _this = this;
 			$.ajax({
 				url: contextPath + '/api/sdh_domain/',
 				contentType: 'application/json',
-				success: function (data) {
-					_this.domainOptions = data._embedded.sdhDomains;
+				success: data => {
+					this.domainOptions = data._embedded.sdhDomains;
 				}
 			});
 			$.ajax({
 				url: contextPath + '/api/clinician_priority/',
 				contentType: 'application/json',
-				success: function (data) {
-					_this.priorityOptions = data._embedded.clinicianPriorities;
+				success: data => {
+					this.priorityOptions = data._embedded.clinicianPriorities;
 				}
 			});
 			$.ajax({
 				url: contextPath + '/api/patient_readiness/',
 				contentType: 'application/json',
-				success: function (data) {
-					_this.readinessOptions = data._embedded.patientReadiness;
+				success: data => {
+					this.readinessOptions = data._embedded.patientReadiness;
 				}
 			});
 			$.ajax({
 				url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
 				contentType: 'application/json',
-				success: function (data) {
-					_this.reviews = data._embedded.clinicianReviews;
+				success: data => {
+					this.reviews = data._embedded.clinicianReviews;
 				}
 			});
 		},
@@ -84,7 +83,7 @@
 					let reviewForDomain = this.reviews.filter( review => {
 						return review.domain === domain.description;
 					});
-					if (reviewForDomain.length == 0) {
+					if (reviewForDomain.length === 0) {
 						return {'domain': domain.description, 'date_last_reviewed': 'NA', 'clinician_priority':'None', 'patient_readiness': 'None'};
 					} else {
 						let review = reviewForDomain[0]; // Unique constraint prevents more than one
