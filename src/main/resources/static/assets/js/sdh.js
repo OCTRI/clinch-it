@@ -2,10 +2,10 @@
 	new Vue({
 		el: '#contents',
 		data: {
-			fields: [ {key:'show_details', label:' ', headerTitle: 'Show Details', sortable:false}, {key:'domain', sortable:true}, {key:'date_last_assessed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}],
+			fields: [ {key:'show_details', label:' ', headerTitle: 'Show Details', sortable:false}, {key:'domain', sortable:true}, {key:'date_last_reviewed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}],
 			filters: {
 			      domain: '',
-			      date_last_assessed: '',
+			      date_last_reviewed: '',
 			      clinician_priority: '',
 			      patient_readiness: ''
 			    },
@@ -85,10 +85,10 @@
 						return review.domain === domain.description;
 					});
 					if (reviewForDomain.length == 0) {
-						return {'domain': domain.description, 'date_last_assessed': 'NA', 'clinician_priority':'None', 'patient_readiness': 'None'};
+						return {'domain': domain.description, 'date_last_reviewed': 'NA', 'clinician_priority':'None', 'patient_readiness': 'None'};
 					} else {
 						let onlyReview = reviewForDomain[0];
-						return {'domain': domain.description, 'date_last_assessed': this._formatDate(onlyReview.updatedAt), 'clinician_priority': onlyReview.clinicianPriority, 'patient_readiness': onlyReview.patientReadiness};						
+						return {'domain': domain.description, 'date_last_reviewed': this._formatDate(onlyReview.updatedAt), 'clinician_priority': onlyReview.clinicianPriority, 'patient_readiness': onlyReview.patientReadiness};						
 					}
 				});
 			},
@@ -99,7 +99,7 @@
 		        });
 		        return filtered.length > 0 ? filtered : [{
 		          domain: '',
-			      date_last_assessed: '',
+			      date_last_reviewed: '',
 		          clinician_priority: '',
 		          patient_readiness: ''
 		        }];
