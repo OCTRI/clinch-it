@@ -94,7 +94,7 @@
 		    filtered () {
 		        const filtered = this.clinicianReviewSummary.filter(item => {
 		          return Object.keys(this.filters).every(key =>
-		              item[key].toLowerCase().includes(this.filters[key].toLowerCase()));
+		              item[key].toLowerCase().startsWith(this.filters[key].toLowerCase()));
 		        });
 		        return filtered.length > 0 ? filtered : [{
 		          domain: '',
