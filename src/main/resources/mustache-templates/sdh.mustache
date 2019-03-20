@@ -16,7 +16,8 @@
 		<b-table show-empty head-variant="dark" :items="emphasized" :fields="fields">
 		  <template slot="top-row" slot-scope="{ fields }">
 		    <td v-for="field in fields" :key="field.key">
-		      <span v-if="_isShowDetails(field)" >Filter By:</span>
+		      <span v-if="_isShowDetails(field)">Filter By:</span>
+		      <span v-else-if="_isEdit(field)"></span>
 		      <input v-else v-model="filters[field.key]" :placeholder="field.label">
 		    </td>
 		  </template>
@@ -25,6 +26,9 @@
         	<b-form-checkbox @change="row.toggleDetails" v-model="row.detailsShowing">
         	<i class="fas fa-angle-right"></i>
         	</b-form-checkbox>
+      	  </template>
+      	  <template slot="edit" slot-scope="row">
+      	  	<i class="far fa-edit" @click="edit(row.item, row.index, $event.target)"></i>
       	  </template>
 		  <template slot="row-details" slot-scope="row">
 		    <b-card class="small">
@@ -63,6 +67,23 @@
               </b-card>
       	   </template>
 		</b-table>
+		<!-- Modal for Creating/Editing a Clinician Review -->
+    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok="handleOk">
+      		<form @submit.stop.prevent="handleSubmit">
+      			<b-form-group
+      				id="clinicianPriorityLabel"
+       				label="Clinician Priority"
+      				label-for="clinicianPriority">
+      			<b-form-select id="clinicianPriority" v-model="modalEditRow.prioritySelected" :options="modalEditRow.priorityOptions" />
+      			</b-form-group>
+      			<b-form-group
+      				id="patientReadinessLabel"
+       				label="Patient Readiness"
+      				label-for="patientReadiness">
+      			<b-form-select id="patientReadiness" v-model="modalEditRow.readinessSelected" :options="modalEditRow.readinessOptions" />
+      			</b-form-group>
+      		</form>
+    	</b-modal>
 	</div>
 
 </div>
