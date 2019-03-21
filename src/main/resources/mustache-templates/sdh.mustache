@@ -68,7 +68,7 @@
       	   </template>
 		</b-table>
 		<!-- Modal for Creating/Editing a Clinician Review -->
-    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok="handleOk">
+    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="handleOk">
       		<form @submit.stop.prevent="handleSubmit">
       			<b-form-group
       				id="clinicianPriorityLabel"

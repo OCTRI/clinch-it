@@ -2,7 +2,7 @@ class ModalEditRow {
 	
 	constructor() {
 		this.title = '';
-		this.id = '';
+		this.id = null;
 		this.domain = '';
 		this.prioritySelected = '';
 		this.readinessSelected = '';
@@ -104,8 +104,8 @@ class ModalEditRow {
 		    },
 		    edit(item, index, target) {
 		    	const domain = this.domainOptions.filter(it => it.description === item.domain)[0].id;
-		    	if (item.id === "") {
-		    		this.modalEditRow.setFields('New Clinician Review', '', domain, '', '');
+		    	if (!item.id) {
+		    		this.modalEditRow.setFields('New Clinician Review', null, domain, '', '');
 		    	} else {
 		    		const prioritySelected = this.priorityOptions.filter(it => it.text === item.clinician_priority)[0].value;
 		    		const readinessSelected = this.readinessOptions.filter(it => it.text === item.patient_readiness)[0].value;
@@ -117,8 +117,7 @@ class ModalEditRow {
 		    	return new ModalEditRow();
 		    },
 		    handleOk(evt) {
-		        // Prevent modal from closing so we can validate
-		        evt.preventDefault();
+		        // Validate the inputs
 		        if (!this.modalEditRow.prioritySelected || !this.modalEditRow.readinessSelected) {
 		          alert('Please enter values');
 		        } else {
@@ -129,7 +128,9 @@ class ModalEditRow {
 				const patient = this.$el.getAttribute('data-patient-id');
 				const contextPath = this.$el.getAttribute('data-context-path');
 				let clinicianReviewId = this.modalEditRow.id;
-				let {url, method, data} = '';
+				let url = '';
+				let method = '';
+				let data = '';
 				if (clinicianReviewId) {
 					url = contextPath + '/api/clinician_review/' + clinicianReviewId;
 					method = 'PATCH';
@@ -154,7 +155,6 @@ class ModalEditRow {
 					data: data,
 					contentType: 'application/json',
 					success: data => {
-						// TODO: Better way to reload without getting all reviews again
 						$.ajax({
 							url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
 							contentType: 'application/json',
