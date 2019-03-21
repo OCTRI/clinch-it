@@ -104,13 +104,17 @@ class ModalEditRow {
 		    _formatDate(dateString) {
 		    	return dateString.replace(/ \d\d:\d\d:\d\d\.\d/, '');
 		    },
+		    _selectValue(options, textTarget) {
+		    	// Find the select item by text and return the value
+		    	return options.filter(it => it.text === textTarget)[0].value;
+		    },
 		    edit(item, index, target) {
-		    	const domain = this.domainOptions.filter(it => it.text === item.domain)[0].value;
+		    	const domain = this._selectValue(this.domainOptions, item.domain);
 		    	if (!item.id) {
 		    		this.modalEditRow.setFields('New Clinician Review', null, domain, '', '');
 		    	} else {
-		    		const prioritySelected = this.priorityOptions.filter(it => it.text === item.clinician_priority)[0].value;
-		    		const readinessSelected = this.readinessOptions.filter(it => it.text === item.patient_readiness)[0].value;
+		    		const prioritySelected = this._selectValue(this.priorityOptions, item.clinician_priority);
+		    		const readinessSelected = this._selectValue(this.readinessOptions, item.patient_readiness);
 		    		this.modalEditRow.setFields('Edit Clinical Review', item.id, domain, prioritySelected, readinessSelected);
 		    	}
 				this.$root.$emit('bv::show::modal', 'modalEditRow', target);
@@ -157,15 +161,12 @@ class ModalEditRow {
 					data: data,
 					contentType: 'application/json',
 					success: data => {
-						this.reviews.map(review => {
-							// Modify the review for the domain
-							if (review._links.domain.href === data._links.domain.href) {
-								const priorityText = this.priorityOptions.filter(it => it.value === this.modalEditRow.prioritySelected)[0].text;								
-								const readinessText = this.readinessOptions.filter(it => it.value === this.modalEditRow.readinessSelected)[0].text;								
-								review.clinicianPriority = priorityText;
-								review.patientReadiness = readinessText;
-							} else {
-								return review;
+						// Get the reviews again. The response does not provide info in a convenient manner for updating only what changed.
+						$.ajax({
+							url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
+							contentType: 'application/json',
+							success: data => {
+								this.reviews = data._embedded.clinicianReviews;
 							}
 						});
 					}
