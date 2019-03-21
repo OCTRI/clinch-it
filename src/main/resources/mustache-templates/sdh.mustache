@@ -74,13 +74,13 @@
       				id="clinicianPriorityLabel"
        				label="Clinician Priority"
       				label-for="clinicianPriority">
-      			<b-form-select id="clinicianPriority" v-model="modalEditRow.prioritySelected" :options="modalEditRow.priorityOptions" />
+      			<b-form-select id="clinicianPriority" v-model="modalEditRow.prioritySelected" :options="priorityOptions" />
       			</b-form-group>
       			<b-form-group
       				id="patientReadinessLabel"
        				label="Patient Readiness"
       				label-for="patientReadiness">
-      			<b-form-select id="patientReadiness" v-model="modalEditRow.readinessSelected" :options="modalEditRow.readinessOptions" />
+      			<b-form-select id="patientReadiness" v-model="modalEditRow.readinessSelected" :options="readinessOptions" />
       			</b-form-group>
       		</form>
     	</b-modal>

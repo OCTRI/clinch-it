@@ -1,4 +1,23 @@
-(function() {
+class ModalEditRow {
+	
+	constructor() {
+		this.title = '';
+		this.id = '';
+		this.domain = '';
+		this.prioritySelected = '';
+		this.readinessSelected = '';
+	}
+	
+	setFields(title, id, domain, prioritySelected, readinessSelected) {
+		this.title = title;
+		this.id = id;
+		this.domain = domain;
+		this.prioritySelected = prioritySelected;
+		this.readinessSelected = readinessSelected;
+	}
+};
+
+(function() {	
 	new Vue({
 		el: '#contents',
 		data: {
@@ -10,8 +29,10 @@
 			      patient_readiness: ''
 			    },
 	        domainOptions: [],
+	        priorityOptions: [],
+	        readinessOptions: [],
 	        reviews: [],
-	        modalEditRow: { title: '', id: '', domain:'', prioritySelected: '', readinessSelected: '', priorityOptions: [], readinessOptions: [] }
+	        modalEditRow: new ModalEditRow()
 		},
 		mounted() {
 			const patient = this.$el.getAttribute('data-patient-id');
@@ -27,7 +48,7 @@
 				url: contextPath + '/api/clinician_priority/',
 				contentType: 'application/json',
 				success: data => {
-					this.modalEditRow.priorityOptions = data._embedded.clinicianPriorities.map(it => {
+					this.priorityOptions = data._embedded.clinicianPriorities.map(it => {
 						return {value: it.id, text: it.description}
 					});
 				}
@@ -36,7 +57,7 @@
 				url: contextPath + '/api/patient_readiness/',
 				contentType: 'application/json',
 				success: data => {
-					this.modalEditRow.readinessOptions = data._embedded.patientReadinesses.map(it => {
+					this.readinessOptions = data._embedded.patientReadinesses.map(it => {
 						return {value: it.id, text: it.description}
 					});
 				}
@@ -82,23 +103,18 @@
 		    	return dateString.replace(/ \d\d:\d\d:\d\d\.\d/, '');
 		    },
 		    edit(item, index, target) {
-		    	this.modalEditRow.domain = this.domainOptions.filter(it => it.description === item.domain)[0].id;
+		    	const domain = this.domainOptions.filter(it => it.description === item.domain)[0].id;
 		    	if (item.id === "") {
-		    		this.modalEditRow.title = 'New Clinical Review';
+		    		this.modalEditRow.setFields('New Clinician Review', '', domain, '', '');
 		    	} else {
-		    		this.modalEditRow.title = 'Edit Clinical Review';
-		    		this.modalEditRow.id = item.id;
-		    	      this.modalEditRow.prioritySelected = this.modalEditRow.priorityOptions.filter(it => it.text === item.clinician_priority)[0].value;
-			        this.modalEditRow.readinessSelected = this.modalEditRow.readinessOptions.filter(it => it.text === item.patient_readiness)[0].value;
+		    		const prioritySelected = this.priorityOptions.filter(it => it.text === item.clinician_priority)[0].value;
+		    		const readinessSelected = this.readinessOptions.filter(it => it.text === item.patient_readiness)[0].value;
+		    		this.modalEditRow.setFields('Edit Clinical Review', item.id, domain, prioritySelected, readinessSelected);
 		    	}
 				this.$root.$emit('bv::show::modal', 'modalEditRow', target);
 		    },
 		    resetModal() {
-		        this.modalEditRow.title = '';
-		        this.modalEditRow.id = '';
-		        this.modalEditRow.domain = '';
-		        this.modalEditRow.prioritySelected = '';
-		        this.modalEditRow.readinessSelected = '';
+		    	return new ModalEditRow();
 		    },
 		    handleOk(evt) {
 		        // Prevent modal from closing so we can validate
