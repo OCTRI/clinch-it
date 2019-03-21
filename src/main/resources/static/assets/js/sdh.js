@@ -41,7 +41,9 @@ class ModalEditRow {
 				url: contextPath + '/api/sdh_domain/',
 				contentType: 'application/json',
 				success: data => {
-					this.domainOptions = data._embedded.sdhDomains;
+					this.domainOptions = data._embedded.sdhDomains.map(it => {
+						return {value: it._links.self.href, text: it.description};
+					});
 				}
 			});
 			$.ajax({
@@ -49,7 +51,7 @@ class ModalEditRow {
 				contentType: 'application/json',
 				success: data => {
 					this.priorityOptions = data._embedded.clinicianPriorities.map(it => {
-						return {value: it.id, text: it.description}
+						return {value: it._links.self.href, text: it.description};
 					});
 				}
 			});
@@ -58,7 +60,7 @@ class ModalEditRow {
 				contentType: 'application/json',
 				success: data => {
 					this.readinessOptions = data._embedded.patientReadinesses.map(it => {
-						return {value: it.id, text: it.description}
+						return {value: it._links.self.href, text: it.description}
 					});
 				}
 			});
@@ -103,7 +105,7 @@ class ModalEditRow {
 		    	return dateString.replace(/ \d\d:\d\d:\d\d\.\d/, '');
 		    },
 		    edit(item, index, target) {
-		    	const domain = this.domainOptions.filter(it => it.description === item.domain)[0].id;
+		    	const domain = this.domainOptions.filter(it => it.text === item.domain)[0].value;
 		    	if (!item.id) {
 		    		this.modalEditRow.setFields('New Clinician Review', null, domain, '', '');
 		    	} else {
@@ -135,17 +137,17 @@ class ModalEditRow {
 					url = contextPath + '/api/clinician_review/' + clinicianReviewId;
 					method = 'PATCH';
 					data = JSON.stringify({
-						clinicianPriority: contextPath + '/api/clinician_priority/' + this.modalEditRow.prioritySelected,
-						patientReadiness: contextPath + '/api/patient_readiness/' + this.modalEditRow.readinessSelected
+						clinicianPriority: this.modalEditRow.prioritySelected,
+						patientReadiness: this.modalEditRow.readinessSelected
 					});
 				} else {
 					url = contextPath + '/api/clinician_review/';
 					method = 'POST';
 					data = JSON.stringify({
 						patient: contextPath + '/api/patient/' + patient,
-						domain: contextPath + '/api/sdh_domain/' + this.modalEditRow.domain,
-						clinicianPriority: contextPath + '/api/clinician_priority/' + this.modalEditRow.prioritySelected,
-						patientReadiness: contextPath + '/api/patient_readiness/' + this.modalEditRow.readinessSelected
+						domain: this.modalEditRow.domain,
+						clinicianPriority: this.modalEditRow.prioritySelected,
+						patientReadiness: this.modalEditRow.readinessSelected
 					});					
 				}
 				
@@ -175,13 +177,13 @@ class ModalEditRow {
 			clinicianReviewSummary () {				
 				return this.domainOptions.map( domain => {
 					let reviewForDomain = this.reviews.filter( review => {
-						return review.domain === domain.description;
+						return review.domain === domain.text;
 					});
 					if (reviewForDomain.length === 0) {
-						return {id: '', domain: domain.description, date_last_reviewed: 'NA', clinician_priority:'None', patient_readiness: 'None'};
+						return {id: '', domain: domain.text, date_last_reviewed: 'NA', clinician_priority:'None', patient_readiness: 'None'};
 					} else {
 						let review = reviewForDomain[0]; // Unique constraint prevents more than one
-						return {id: review.id, domain: domain.description, date_last_reviewed: this._formatDate(review.updatedAt), clinician_priority: review.clinicianPriority, patient_readiness: review.patientReadiness};						
+						return {id: review.id, domain: domain.text, date_last_reviewed: this._formatDate(review.updatedAt), clinician_priority: review.clinicianPriority, patient_readiness: review.patientReadiness};						
 					}
 				});
 			},
