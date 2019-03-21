@@ -157,11 +157,15 @@ class ModalEditRow {
 					data: data,
 					contentType: 'application/json',
 					success: data => {
-						$.ajax({
-							url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
-							contentType: 'application/json',
-							success: data => {
-								this.reviews = data._embedded.clinicianReviews;
+						this.reviews.map(review => {
+							// Modify the review for the domain
+							if (review._links.domain.href === data._links.domain.href) {
+								const priorityText = this.priorityOptions.filter(it => it.value === this.modalEditRow.prioritySelected)[0].text;								
+								const readinessText = this.readinessOptions.filter(it => it.value === this.modalEditRow.readinessSelected)[0].text;								
+								review.clinicianPriority = priorityText;
+								review.patientReadiness = readinessText;
+							} else {
+								return review;
 							}
 						});
 					}
