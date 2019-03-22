@@ -28,6 +28,10 @@ public interface ClinicianReviewSummary {
 	
 	@Value("#{target.getPatientReadiness().getDescription()}")
 	String getPatientReadiness();
+	
+	Boolean getReferred();
+	
+	Boolean getReferralComplete();
 }
 
 	

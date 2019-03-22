@@ -22,11 +22,19 @@ public class ClinicianReview extends AbstractEntity {
 	@ManyToOne
 	private SdhDomain domain;
 	
+	@NotNull
 	@ManyToOne
 	private ClinicianPriority clinicianPriority;
 	
+	@NotNull
 	@ManyToOne
 	private PatientReadiness patientReadiness;
+	
+	@NotNull
+	private Boolean referred;
+	
+	@NotNull
+	private Boolean referralComplete;
 
 	public Patient getPatient() {
 		return patient;
@@ -58,6 +66,22 @@ public class ClinicianReview extends AbstractEntity {
 
 	public void setPatientReadiness(PatientReadiness patientReadiness) {
 		this.patientReadiness = patientReadiness;
+	}
+
+	public Boolean getReferred() {
+		return referred;
+	}
+
+	public void setReferred(Boolean referred) {
+		this.referred = referred;
+	}
+
+	public Boolean getReferralComplete() {
+		return referralComplete;
+	}
+
+	public void setReferralComplete(Boolean referralComplete) {
+		this.referralComplete = referralComplete;
 	}
 	
 }
