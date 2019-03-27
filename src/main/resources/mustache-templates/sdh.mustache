@@ -17,7 +17,7 @@
 		  <template slot="top-row" slot-scope="{ fields }">
 		    <td v-for="field in fields" :key="field.key">
 		      <span v-if="_isShowDetails(field)">Filter By:</span>
-		      <span v-else-if="_isEdit(field)"></span>
+		      <span v-else-if="_isUnfiltered(field)"></span>
 		      <input v-else v-model="filters[field.key]" :placeholder="field.label">
 		    </td>
 		  </template>
@@ -81,6 +81,18 @@
        				label="Patient Readiness"
       				label-for="patientReadiness">
       			<b-form-select id="patientReadiness" v-model="modalEditRow.readinessSelected" :options="readinessOptions" />
+      			</b-form-group>
+      			<b-form-group
+      				id="referredLabel"
+       				label="Referred"
+      				label-for="referred">
+      			<b-form-select id="referred" v-model="modalEditRow.referred" :options="yesNoOptions" />
+      			</b-form-group>
+      			<b-form-group
+      				id="referralCompleteLabel"
+       				label="Referral Complete"
+      				label-for="referralComplete">
+      			<b-form-select id="referralComplete" v-model="modalEditRow.referralComplete" :options="yesNoOptions" />
       			</b-form-group>
       		</form>
     	</b-modal>
