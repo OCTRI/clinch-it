@@ -21,10 +21,103 @@ class ModalEditRow {
 	}
 };
 
-(function() {	
+(function() {
+	
+	const patient = $('#contents').attr('data-patient-id');
+	const contextPath = $('#contents').attr('data-context-path');
+
 	new Vue({
 		el: '#contents',
+		template: `
+		  <div>
+		  <b-table show-empty head-variant="dark" :items="emphasized" :fields="fields">
+		  <template slot="top-row" slot-scope="{ fields }">
+		    <td v-for="field in fields" :key="field.key">
+		      <span v-if="_isShowDetails(field)">Filter By:</span>
+		      <span v-else-if="_isUnfiltered(field)"></span>
+		      <input v-else v-model="filters[field.key]" :placeholder="field.label">
+		    </td>
+		  </template>
+     	  <template slot="show_details" slot-scope="row">
+        	<!-- As row.showDetails is one-way, we call the toggleDetails function on @change -->
+        	<b-form-checkbox @change="row.toggleDetails" v-model="row.detailsShowing">
+        	<i class="fas fa-angle-right"></i>
+        	</b-form-checkbox>
+      	  </template>
+      	  <template slot="edit" slot-scope="row">
+      	  	<i class="far fa-edit" @click="edit(row.item, row.index, $event.target)"></i>
+      	  </template>
+		  <template slot="row-details" slot-scope="row">
+		    <b-card class="small">
+		  	<div>
+  				<b-tabs content-class="mt-3">
+    				<b-tab title="Current Questionnaire Response" active>
+	               		<table>
+	             			<tbody>
+	             				<tr>
+	             					<td>1. In the last 12 months, were you worried that your food would run out before you got money to buy more?</td>
+	             					<td>Y</td>
+	             				</tr>
+	             				<tr>
+	             					<td>2. In the last 12 months, did you ever eat less than you felt you should because there wasn’t enough money for food?</td>
+	             					<td>Y</td>
+	             				</tr>
+	             				<tr>
+	             					<td>3. In the last 12 months, were you every hungry but didn’t eat because there wasn’t enough money for food?</td>
+	             					<td>N</td>
+	             				</tr>
+	             				<tr>
+	             					<td>4. In the last 12 months, since last (name of current month), did (you/you or other adults in your household) ever cut the size of your meals or skip meals because there wasn’t enough money for food?</td>
+	             					<td>Y</td>
+	             				</tr>
+	             			</tbody>
+	             		</table>                	
+    				</b-tab>
+    				<b-tab title="Historic Questionnaire Response">
+						<p>This might be a clickable list of dates or the menu item might be a dropdown.</p>
+    				</b-tab>
+    				<b-tab title="New Questionnaire Response" >
+						<p>Fill out a new response.</p>
+    				</b-tab>
+  				</b-tabs>
+              </div>
+              </b-card>
+      	   </template>
+		</b-table>
+		<!-- Modal for Creating/Editing a Clinician Review -->
+    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="handleOk">
+      		<form @submit.stop.prevent="handleSubmit">
+      			<b-form-group
+      				id="clinicianPriorityLabel"
+       				label="Clinician Priority"
+      				label-for="clinicianPriority">
+      			<b-form-select id="clinicianPriority" v-model="modalEditRow.prioritySelected" :options="priorityOptions" />
+      			</b-form-group>
+      			<b-form-group
+      				id="patientReadinessLabel"
+       				label="Patient Readiness"
+      				label-for="patientReadiness">
+      			<b-form-select id="patientReadiness" v-model="modalEditRow.readinessSelected" :options="readinessOptions" />
+      			</b-form-group>
+      			<b-form-group
+      				id="referredLabel"
+       				label="Referred"
+      				label-for="referred">
+      			<b-form-select id="referred" v-model="modalEditRow.referred" :options="yesNoOptions" />
+      			</b-form-group>
+      			<b-form-group
+      				id="referralCompleteLabel"
+       				label="Referral Complete"
+      				label-for="referralComplete">
+      			<b-form-select id="referralComplete" v-model="modalEditRow.referralComplete" :options="yesNoOptions" />
+      			</b-form-group>
+      		</form>
+    	</b-modal>
+		</div>
+		`,
 		data: {
+			patient,
+			contextPath,
 			fields: [ {key:'show_details', label:' ', headerTitle: 'Show Details', sortable:false}, {key:'domain', sortable:true}, {key:'last_reviewed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}, {key:'referred', sortable:true}, {key:'referral_complete', sortable:true}, {key:'edit', label:' ', headerTitle: 'Edit', sortable:false}],
 			filters: {
 			      domain: '',
@@ -42,8 +135,6 @@ class ModalEditRow {
 	        modalEditRow: new ModalEditRow()
 		},
 		mounted() {
-			const patient = this.$el.getAttribute('data-patient-id');
-			const contextPath = this.$el.getAttribute('data-context-path');
 			$.ajax({
 				url: contextPath + '/api/sdh_domain/',
 				contentType: 'application/json',
@@ -72,7 +163,7 @@ class ModalEditRow {
 				}
 			});
 			$.ajax({
-				url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
+				url: this.contextPath + '/api/clinician_review/search/findByPatientId?id=' + this.patient,
 				contentType: 'application/json',
 				success: data => {
 					this.reviews = data._embedded.clinicianReviews;
@@ -144,8 +235,6 @@ class ModalEditRow {
 		        }
 		    },
 		    handleSubmit() {
-				const patient = this.$el.getAttribute('data-patient-id');
-				const contextPath = this.$el.getAttribute('data-context-path');
 				let clinicianReviewId = this.modalEditRow.id;
 				let url = '';
 				let method = '';
@@ -156,12 +245,12 @@ class ModalEditRow {
 					referralComplete: this.modalEditRow.referralComplete
 				};
 				if (clinicianReviewId) {
-					url = contextPath + '/api/clinician_review/' + clinicianReviewId;
+					url = this.contextPath + '/api/clinician_review/' + clinicianReviewId;
 					method = 'PATCH';
 				} else {
-					url = contextPath + '/api/clinician_review/';
+					url = this.contextPath + '/api/clinician_review/';
 					method = 'POST';
-					obj.patient = contextPath + '/api/patient/' + patient;
+					obj.patient = this.contextPath + '/api/patient/' + this.patient;
 					obj.domain = this.modalEditRow.domain;
 				}
 				
