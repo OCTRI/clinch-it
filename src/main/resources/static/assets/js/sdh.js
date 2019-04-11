@@ -163,7 +163,7 @@ class ModalEditRow {
 				}
 			});
 			$.ajax({
-				url: this.contextPath + '/api/clinician_review/search/findByPatientId?id=' + this.patient,
+				url: `${this.contextPath}/api/clinician_review/search/findByPatientId?id=${this.patient}`,
 				contentType: 'application/json',
 				success: data => {
 					this.reviews = data._embedded.clinicianReviews;
@@ -245,12 +245,12 @@ class ModalEditRow {
 					referralComplete: this.modalEditRow.referralComplete
 				};
 				if (clinicianReviewId) {
-					url = this.contextPath + '/api/clinician_review/' + clinicianReviewId;
+					url = `${this.contextPath}/api/clinician_review/${clinicianReviewId}`;
 					method = 'PATCH';
 				} else {
-					url = this.contextPath + '/api/clinician_review/';
+					url = `${this.contextPath}/api/clinician_review/`;
 					method = 'POST';
-					obj.patient = this.contextPath + '/api/patient/' + this.patient;
+					obj.patient = `${this.contextPath}/api/patient/${this.patient}`;
 					obj.domain = this.modalEditRow.domain;
 				}
 				
@@ -262,7 +262,7 @@ class ModalEditRow {
 					success: data => {
 						// Get the reviews again. The response does not provide info in a convenient manner for updating only what changed.
 						$.ajax({
-							url: contextPath + '/api/clinician_review/search/findByPatientId?id=' + patient,
+							url: `${this.contextPath}/api/clinician_review/search/findByPatientId?id=${this.patient}`,
 							contentType: 'application/json',
 							success: data => {
 								this.reviews = data._embedded.clinicianReviews;
