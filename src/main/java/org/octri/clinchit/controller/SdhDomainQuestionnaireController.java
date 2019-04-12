@@ -1,8 +1,8 @@
 
 package org.octri.clinchit.controller;
 
-import org.octri.clinchit.domain.SdhDomainQuestion;
-import org.octri.clinchit.repository.SdhDomainQuestionRepository;
+import org.octri.clinchit.domain.SdhDomainQuestionnaire;
+import org.octri.clinchit.repository.SdhDomainQuestionnaireRepository;
 import org.octri.clinchit.repository.SdhDomainRepository;
 import org.octri.clinchit.view.OptionList;
 import java.util.Map;
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Controller for {@link SdhDomainQuestion} objects.
+ * Controller for {@link SdhDomainQuestionnaire} objects.
  */
 @Controller
-@RequestMapping("/data/sdh_domain_question")
-public class SdhDomainQuestionController extends AbstractEntityController<SdhDomainQuestion, SdhDomainQuestionRepository> {
+@RequestMapping("/data/sdh_domain_questionnaire")
+public class SdhDomainQuestionnaireController extends AbstractEntityController<SdhDomainQuestionnaire, SdhDomainQuestionnaireRepository> {
 	
 	@Autowired
-	private SdhDomainQuestionRepository repository;
+	private SdhDomainQuestionnaireRepository repository;
 	@Autowired
 	private SdhDomainRepository sdhDomainRepository;
 
@@ -37,7 +37,7 @@ public class SdhDomainQuestionController extends AbstractEntityController<SdhDom
 	public String edit(Map<String, Object> model, @PathVariable Long id) {
 		String template = super.edit(model, id);
 
-		SdhDomainQuestion entity = (SdhDomainQuestion) model.get("entity");
+		SdhDomainQuestionnaire entity = (SdhDomainQuestionnaire) model.get("entity");
 
 		// Add options for select.
 		model.put("sdhDomainOptions", 
@@ -46,12 +46,12 @@ public class SdhDomainQuestionController extends AbstractEntityController<SdhDom
 	}
 
 	@Override
-	protected Class<SdhDomainQuestion> domainClass() {
-		return SdhDomainQuestion.class;
+	protected Class<SdhDomainQuestionnaire> domainClass() {
+		return SdhDomainQuestionnaire.class;
 	}
 	
 	@Override
-	protected SdhDomainQuestionRepository getRepository() {
+	protected SdhDomainQuestionnaireRepository getRepository() {
 		return this.repository;
 	}
 }
