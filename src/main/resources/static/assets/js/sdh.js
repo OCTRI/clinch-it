@@ -25,7 +25,7 @@ class ModalEditRow {
 	
 	const patient = $('#contents').attr('data-patient-id');
 	const contextPath = $('#contents').attr('data-context-path');
-
+	
 	new Vue({
 		el: '#contents',
 		template: `
@@ -40,7 +40,7 @@ class ModalEditRow {
 		  </template>
      	  <template slot="show_details" slot-scope="row">
         	<!-- As row.showDetails is one-way, we call the toggleDetails function on @change -->
-        	<b-form-checkbox @change="row.toggleDetails" v-model="row.detailsShowing">
+        	<b-form-checkbox @change="rowDetails(row, $event.target)" v-model="row.detailsShowing">
         	<i class="fas fa-angle-right"></i>
         	</b-form-checkbox>
       	  </template>
@@ -51,33 +51,16 @@ class ModalEditRow {
 		    <b-card class="small">
 		  	<div>
   				<b-tabs content-class="mt-3">
-    				<b-tab title="Current Questionnaire Response" active>
-	               		<table>
-	             			<tbody>
-	             				<tr>
-	             					<td>1. In the last 12 months, were you worried that your food would run out before you got money to buy more?</td>
-	             					<td>Y</td>
-	             				</tr>
-	             				<tr>
-	             					<td>2. In the last 12 months, did you ever eat less than you felt you should because there wasn’t enough money for food?</td>
-	             					<td>Y</td>
-	             				</tr>
-	             				<tr>
-	             					<td>3. In the last 12 months, were you every hungry but didn’t eat because there wasn’t enough money for food?</td>
-	             					<td>N</td>
-	             				</tr>
-	             				<tr>
-	             					<td>4. In the last 12 months, since last (name of current month), did (you/you or other adults in your household) ever cut the size of your meals or skip meals because there wasn’t enough money for food?</td>
-	             					<td>Y</td>
-	             				</tr>
-	             			</tbody>
-	             		</table>                	
-    				</b-tab>
-    				<b-tab title="Historic Questionnaire Response">
-						<p>This might be a clickable list of dates or the menu item might be a dropdown.</p>
+    				<b-tab v-if="hasResponse" title="Current Questionnaire Response" active>
     				</b-tab>
     				<b-tab title="New Questionnaire Response" >
-						<p>Fill out a new response.</p>
+						<b-form @submit.stop.prevent="validateQuestionnaire">
+							<b-form-group v-for="question in newQuestionnaire.questions">
+								<label :for="question.number">{{question.text}}</label>
+								<b-form-select :id="question.number" v-model="question.answer" :options="question.answers" size="sm"></b-form-select>
+							</b-form-group>
+							<b-button type="submit" variant="primary">Submit</b-button>
+						</b-form>
     				</b-tab>
   				</b-tabs>
               </div>
@@ -85,8 +68,8 @@ class ModalEditRow {
       	   </template>
 		</b-table>
 		<!-- Modal for Creating/Editing a Clinician Review -->
-    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="handleOk">
-      		<form @submit.stop.prevent="handleSubmit">
+    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="validateClinicianReview">
+      		<form @submit.stop.prevent="submitClinicianReview">
       			<b-form-group
       				id="clinicianPriorityLabel"
        				label="Clinician Priority"
@@ -132,6 +115,8 @@ class ModalEditRow {
 	        readinessOptions: [],
 	        yesNoOptions: [{value: true, text:'Y'}, {value: false, text:'N'}],
 	        reviews: [],
+	        questionnaires: [],
+	        expandedRow: {},
 	        modalEditRow: new ModalEditRow()
 		},
 		mounted() {
@@ -167,6 +152,13 @@ class ModalEditRow {
 				contentType: 'application/json',
 				success: data => {
 					this.reviews = data._embedded.clinicianReviews;
+				}
+			});
+			$.ajax({
+				url: `${this.contextPath}/api/sdh_domain_questionnaire/`,
+				contentType: 'application/json',
+				success: data => {
+					this.questionnaires = data._embedded.sdhDomainQuestionnaires;
 				}
 			});
 		},
@@ -209,7 +201,7 @@ class ModalEditRow {
 		    _selectText(options, valueTarget) {
 		    	// Find the select item by value and return the text
 		    	return options.filter(it => it.value === valueTarget)[0].text;
-		    },
+		    },	
 		    edit(item, index, target) {
 		    	const domain = this._selectValue(this.domainOptions, item.domain);
 	    		const referred = this._selectValue(this.yesNoOptions, item.referred);
@@ -223,18 +215,29 @@ class ModalEditRow {
 		    	}
 				this.$root.$emit('bv::show::modal', 'modalEditRow', target);
 		    },
+		    rowDetails(row, target) {
+		    	if (row.detailsShowing === false) {
+		    		// Close all other rows
+		    		this.emphasized.forEach(item => {
+		    			item._showDetails = (item === row.item);
+		    		});		
+		    		this.expandedRow = row;
+		    	} else {
+		    		row.toggleDetails();
+		    	}
+		    },
 		    resetModal() {
 		    	return new ModalEditRow();
 		    },
-		    handleOk(evt) {
+		    validateClinicianReview(evt) {
 		        // Validate the inputs
 		        if (!this.modalEditRow.prioritySelected || !this.modalEditRow.readinessSelected) {
 		          alert('Please enter values');
 		        } else {
-		          this.handleSubmit();
+		          this.submitClinicianReview();
 		        }
 		    },
-		    handleSubmit() {
+		    submitClinicianReview() {
 				let clinicianReviewId = this.modalEditRow.id;
 				let url = '';
 				let method = '';
@@ -275,6 +278,17 @@ class ModalEditRow {
 		            // Wrapped in $nextTick to ensure DOM is rendered before closing
 		            this.$refs.modal.hide();
 		        });
+		    },
+		    validateQuestionnaire() {
+		    	const blankAnswer = this.newQuestionnaire.questions.some(q => q.answer === "");
+		    	if (blankAnswer) {
+		    		alert("Please answer all questions");
+		    	} else {
+		    		this.submitQuestionnaire();
+		    	}
+		    },
+		    submitQuestionnaire() {
+		    	console.log(this.newQuestionnaire.questions);
 		    }
 		},
 		computed: {
@@ -317,6 +331,19 @@ class ModalEditRow {
 		    		return tmp;
 		    	});
 		    	return emphasized;
+		    },
+		    expandedDomain() {
+		    	return this.expandedRow.item.domain;
+		    },
+		    hasResponse() {
+		    	return false;
+		    },
+		    newQuestionnaire() {
+		    	// Get the questionnaire for the expanded domain
+		    	const domainQuestionnaire = this.questionnaires.filter(q => q.sdhDomain === this.expandedDomain);
+		    	const questions = JSON.parse(domainQuestionnaire[0].questionJson).questions;
+		    	questions.forEach(q => q.answer = "");
+		    	return {domain: this.expandedDomain, questions: questions};
 		    }
 		}
 	});
