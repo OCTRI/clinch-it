@@ -51,11 +51,20 @@ class ModalEditRow {
 		    <b-card class="small">
 		  	<div>
   				<b-tabs content-class="mt-3">
-    				<b-tab v-if="hasResponse" title="Current Questionnaire Response" active>
+    				<b-tab v-if="hasResponseForDomain" title="Historical Responses">
+    					<div>
+    						<label>Response Date</label>
+							<b-form-select v-model="selectedResponseDate" :options="responseDates"></b-form-select>
+    						<hr>
+ 							<b-form-group v-for="question in selectedResponse.questions">
+								<label :for="question.number">{{question.text}}</label>
+								<b-form-select disabled :id="question.number" v-model="question.answer" :options="question.answers" size="sm"></b-form-select>
+							</b-form-group>
+   						</div>
     				</b-tab>
     				<b-tab title="New Questionnaire Response" >
-						<b-form @submit.stop.prevent="validateQuestionnaire">
-							<b-form-group v-for="question in newQuestionnaire.questions">
+						<b-form @submit.stop.prevent="validateResponse">
+							<b-form-group v-for="question in newResponse.questions">
 								<label :for="question.number">{{question.text}}</label>
 								<b-form-select :id="question.number" v-model="question.answer" :options="question.answers" size="sm"></b-form-select>
 							</b-form-group>
@@ -116,7 +125,9 @@ class ModalEditRow {
 	        yesNoOptions: [{value: true, text:'Y'}, {value: false, text:'N'}],
 	        reviews: [],
 	        questionnaires: [],
+	        responses: [],
 	        expandedRow: {},
+	        selectedResponseDate: null,
 	        modalEditRow: new ModalEditRow()
 		},
 		mounted() {
@@ -159,6 +170,13 @@ class ModalEditRow {
 				contentType: 'application/json',
 				success: data => {
 					this.questionnaires = data._embedded.sdhDomainQuestionnaires;
+				}
+			});
+			$.ajax({
+				url: `${this.contextPath}/api/questionnaire_response/search/findByPatientId?id=${this.patient}`,
+				contentType: 'application/json',
+				success: data => {
+					this.responses = data._embedded.questionnaireResponses;
 				}
 			});
 		},
@@ -222,6 +240,10 @@ class ModalEditRow {
 		    			item._showDetails = (item === row.item);
 		    		});		
 		    		this.expandedRow = row;
+		    		// Set the selected response date to current when first expanded
+		    		if (this.hasResponseForDomain) {
+		    			this.selectedResponseDate = this.currentResponse.createdAt;
+		    		}
 		    	} else {
 		    		row.toggleDetails();
 		    	}
@@ -279,17 +301,40 @@ class ModalEditRow {
 		            this.$refs.modal.hide();
 		        });
 		    },
-		    validateQuestionnaire() {
-		    	const blankAnswer = this.newQuestionnaire.questions.some(q => q.answer === "");
+		    validateResponse() {
+		    	const blankAnswer = this.newResponse.questions.some(q => q.answer === "");
 		    	if (blankAnswer) {
 		    		alert("Please answer all questions");
 		    	} else {
-		    		this.submitQuestionnaire();
+		    		this.submitResponse();
 		    	}
 		    },
-		    submitQuestionnaire() {
-		    	console.log(this.newQuestionnaire.questions);
+		    submitResponse() {
+		    	let obj = {
+		    		answerJson: JSON.stringify(this.newResponse.questions),
+		    		patient: `${this.contextPath}/api/patient/${this.patient}`,
+		    		sdhDomainQuestionnaire: this.newResponse.href
+		    	}
+				$.ajax({
+					url: `${this.contextPath}/api/questionnaire_response/`,
+					method: 'POST',
+					data: JSON.stringify(obj),
+					contentType: 'application/json',
+					success: data => {
+						// Reload the page. Otherwise, row details tabs load in wrong order.
+						location.reload();
+					}
+				});
+
+		    },
+		    selectResponse() {
+		    	console.log(this.selectedResponseDate);
 		    }
+		},
+		watch: {
+			selectedResponseDate: function(newDate, oldDate) {
+				// This triggers the UI to update the selectedResponse
+			}
 		},
 		computed: {
 			clinicianReviewSummary () {				
@@ -335,15 +380,44 @@ class ModalEditRow {
 		    expandedDomain() {
 		    	return this.expandedRow.item.domain;
 		    },
-		    hasResponse() {
-		    	return false;
+		    responsesForDomain() {
+		    	const responses = this.responses.filter(r => r.domain === this.expandedDomain);
+		    	const mapped = responses.map(r => {
+		    		return {createdAt: r.createdAt, questions: JSON.parse(r.answerJson)}
+		    	});
+		    	return mapped;
 		    },
-		    newQuestionnaire() {
+		    responseDates() {
+		    	return this.responsesForDomain.map(r => r.createdAt).sort().reverse().map(date => { 
+		    		return {value: date, text: this._formatDate(date)};
+		    	});
+		    },
+		    hasResponseForDomain() {
+		    	return this.responsesForDomain.length > 0;
+		    },
+		    currentResponse() {
+		    	if (this.hasResponseForDomain === true) {
+			    	const currentResponse = this.responsesForDomain.reduce(function(r1, r2) {
+	    				return r1.createdAt > r2.createdAt ? r1 : r2;
+	    			});
+			    	return currentResponse;
+		    	}
+		    	return null;
+		    },
+		    selectedResponse() {
+		    	if (this.hasResponseForDomain === true) {
+			    	const selectedResponse = this.responsesForDomain.find(r => r.createdAt === this.selectedResponseDate)
+			    	return selectedResponse;
+		    	}
+		    	return null;
+		    },
+		    newResponse() {
 		    	// Get the questionnaire for the expanded domain
 		    	const domainQuestionnaire = this.questionnaires.filter(q => q.sdhDomain === this.expandedDomain);
 		    	const questions = JSON.parse(domainQuestionnaire[0].questionJson).questions;
+		    	// Start with blank answers for each question
 		    	questions.forEach(q => q.answer = "");
-		    	return {domain: this.expandedDomain, questions: questions};
+		    	return {domain: this.expandedDomain, questions: questions, href:domainQuestionnaire[0]._links.self.href};
 		    }
 		}
 	});
