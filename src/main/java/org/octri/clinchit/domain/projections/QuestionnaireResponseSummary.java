@@ -27,6 +27,8 @@ public interface QuestionnaireResponseSummary {
 	
 	Boolean getWantsHelp();
 	
+	String getComments();
+	
 }
 
 	

@@ -32,7 +32,11 @@ public class QuestionnaireResponse extends AbstractEntity {
 	
 	@NotNull
 	private Boolean wantsHelp;
-	
+
+	@Lob
+	@Column(columnDefinition = "TEXT")
+	private String comments;
+
 	public Patient getPatient() {
 		return patient;
 	}
@@ -63,6 +67,14 @@ public class QuestionnaireResponse extends AbstractEntity {
 
 	public void setWantsHelp(Boolean wantsHelp) {
 		this.wantsHelp = wantsHelp;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 
 }
