@@ -50,16 +50,19 @@ class ModalEditRow {
 		  <template slot="row-details" slot-scope="row">
 		    <b-card class="small">
 		  	<div>
-  				<b-tabs content-class="mt-3">
-    				<b-tab v-if="hasResponseForDomain" title="Historical Responses">
-    					<div>
+  				<b-tabs v-model="tabIndex" content-class="mt-3">
+    				<b-tab title="Historical Responses">
+    					<div v-if="hasResponseForDomain">
     						<label>Response Date</label>
 							<b-form-select v-model="selectedResponseDate" :options="responseDates"></b-form-select>
     						<hr>
- 							<b-form-group v-for="question in selectedResponse.questions">
+ 							<b-form-group v-for="question in selectedResponse.questions" :key="question.number">
 								<label :for="question.number">{{question.text}}</label>
 								<b-form-select disabled :id="question.number" v-model="question.answer" :options="question.answers" size="sm"></b-form-select>
 							</b-form-group>
+   						</div>
+   						<div v-else>
+   							None
    						</div>
     				</b-tab>
     				<b-tab title="New Questionnaire Response" >
@@ -127,6 +130,7 @@ class ModalEditRow {
 	        questionnaires: [],
 	        responses: [],
 	        expandedRow: {},
+	        tabIndex: 0,
 	        selectedResponseDate: null,
 	        modalEditRow: new ModalEditRow()
 		},
@@ -240,6 +244,7 @@ class ModalEditRow {
 		    			item._showDetails = (item === row.item);
 		    		});		
 		    		this.expandedRow = row;
+	    			this.tabIndex = 0;
 		    		// Set the selected response date to current when first expanded
 		    		if (this.hasResponseForDomain) {
 		    			this.selectedResponseDate = this.currentResponse.createdAt;
@@ -321,14 +326,18 @@ class ModalEditRow {
 					data: JSON.stringify(obj),
 					contentType: 'application/json',
 					success: data => {
-						// Reload the page. Otherwise, row details tabs load in wrong order.
-						location.reload();
+						$.ajax({
+							url: `${this.contextPath}/api/questionnaire_response/search/findByPatientId?id=${this.patient}`,
+							contentType: 'application/json',
+							success: data => {
+								this.responses = data._embedded.questionnaireResponses;
+								this.selectedResponseDate = this.currentResponse.createdAt;
+								this.tabIndex = 0;
+							}
+						});
 					}
 				});
-
-		    },
-		    selectResponse() {
-		    	console.log(this.selectedResponseDate);
+		    	
 		    }
 		},
 		watch: {
@@ -388,6 +397,7 @@ class ModalEditRow {
 		    	return mapped;
 		    },
 		    responseDates() {
+		    	// Select options for response date are in reverse creation order
 		    	return this.responsesForDomain.map(r => r.createdAt).sort().reverse().map(date => { 
 		    		return {value: date, text: this._formatDate(date)};
 		    	});
