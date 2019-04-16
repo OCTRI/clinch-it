@@ -97,7 +97,7 @@ class ModalEditRow {
       	   </template>
 		</b-table>
 		<!-- Modal for Creating/Editing a Clinician Review -->
-    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="validateClinicianReview">
+    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="submitClinicianReview">
       		<form @submit.stop.prevent="submitClinicianReview">
       			<b-form-group
       				id="clinicianPriorityLabel"
@@ -141,6 +141,7 @@ class ModalEditRow {
 			    },
 	        domainOptions: [],
 	        priorityOptions: [],
+	        emptyOption: "---",
 	        readinessOptions: [],
 	        yesNoOptions: [{value: true, text:'Y'}, {value: false, text:'N'}],
 	        yesNoLongOptions: [{value: true, text:'Yes'}, {value: false, text:'No'}],
@@ -170,6 +171,7 @@ class ModalEditRow {
 					this.priorityOptions = data._embedded.clinicianPriorities.map(it => {
 						return {value: it._links.self.href, text: it.description};
 					});
+					this.priorityOptions.unshift({value:null, text:this.emptyOption});
 				}
 			});
 			$.ajax({
@@ -179,6 +181,7 @@ class ModalEditRow {
 					this.readinessOptions = data._embedded.patientReadinesses.map(it => {
 						return {value: it._links.self.href, text: it.description}
 					});
+					this.readinessOptions.unshift({value:null, text:this.emptyOption});
 				}
 			});
 			$.ajax({
@@ -275,14 +278,6 @@ class ModalEditRow {
 		    resetModal() {
 		    	return new ModalEditRow();
 		    },
-		    validateClinicianReview(evt) {
-		        // Validate the inputs
-		        if (!this.modalEditRow.prioritySelected || !this.modalEditRow.readinessSelected) {
-		          alert('Please enter values');
-		        } else {
-		          this.submitClinicianReview();
-		        }
-		    },
 		    submitClinicianReview() {
 				let clinicianReviewId = this.modalEditRow.id;
 				let url = '';
@@ -374,10 +369,12 @@ class ModalEditRow {
 						return review.domain === domain.text;
 					});
 					if (reviewForDomain.length === 0) {
-						return {id: '', domain: domain.text, last_reviewed: 'NA', clinician_priority:'None', patient_readiness: 'None', referred: this._selectText(this.yesNoOptions, false), referral_complete: this._selectText(this.yesNoOptions, false)};
+						return {id: '', domain: domain.text, last_reviewed: 'NA', clinician_priority:this.emptyOption, patient_readiness: this.emptyOption, referred: this._selectText(this.yesNoOptions, false), referral_complete: this._selectText(this.yesNoOptions, false)};
 					} else {
-						let review = reviewForDomain[0]; // Unique constraint prevents more than one
-						return {id: review.id, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: review.clinicianPriority, patient_readiness: review.patientReadiness, referred: this._selectText(this.yesNoOptions, review.referred), referral_complete: this._selectText(this.yesNoOptions, review.referralComplete)};						
+						const review = reviewForDomain[0]; // Unique constraint prevents more than one
+						const priority = review.clinicianPriority ? review.clinicianPriority.description : this.emptyOption;
+						const readiness = review.patientReadiness ? review.patientReadiness.description : this.emptyOption;
+						return {id: review.id, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: priority, patient_readiness: readiness, referred: this._selectText(this.yesNoOptions, review.referred), referral_complete: this._selectText(this.yesNoOptions, review.referralComplete)};						
 					}
 				});
 			},

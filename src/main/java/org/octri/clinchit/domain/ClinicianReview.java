@@ -22,11 +22,9 @@ public class ClinicianReview extends AbstractEntity {
 	@ManyToOne
 	private SdhDomain domain;
 	
-	@NotNull
 	@ManyToOne
 	private ClinicianPriority clinicianPriority;
 	
-	@NotNull
 	@ManyToOne
 	private PatientReadiness patientReadiness;
 	

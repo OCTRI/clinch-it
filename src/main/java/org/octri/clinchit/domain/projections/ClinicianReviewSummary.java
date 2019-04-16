@@ -1,6 +1,8 @@
 package org.octri.clinchit.domain.projections;
 
+import org.octri.clinchit.domain.ClinicianPriority;
 import org.octri.clinchit.domain.ClinicianReview;
+import org.octri.clinchit.domain.PatientReadiness;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 
@@ -23,11 +25,11 @@ public interface ClinicianReviewSummary {
 	@Value("#{target.getDomain().getDescription()}")
 	String getDomain();
 	
-	@Value("#{target.getClinicianPriority().getDescription()}")
-	String getClinicianPriority();
+	@Value("#{target.getClinicianPriority()}")
+	ClinicianPriority getClinicianPriority();
 	
-	@Value("#{target.getPatientReadiness().getDescription()}")
-	String getPatientReadiness();
+	@Value("#{target.getPatientReadiness()}")
+	PatientReadiness getPatientReadiness();
 	
 	Boolean getReferred();
 	
