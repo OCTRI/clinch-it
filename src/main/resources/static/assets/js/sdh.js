@@ -372,8 +372,8 @@ class ModalEditRow {
 						return {id: '', domain: domain.text, last_reviewed: 'NA', clinician_priority:this.emptyOption, patient_readiness: this.emptyOption, referred: this._selectText(this.yesNoOptions, false), referral_complete: this._selectText(this.yesNoOptions, false)};
 					} else {
 						const review = reviewForDomain[0]; // Unique constraint prevents more than one
-						const priority = (review.clinicianPriority != null) ? review.clinicianPriority.description : this.emptyOption;
-						const readiness = (review.patientReadiness != null) ? review.patientReadiness.description : this.emptyOption;
+						const priority = review.clinicianPriority ? review.clinicianPriority.description : this.emptyOption;
+						const readiness = review.patientReadiness ? review.patientReadiness.description : this.emptyOption;
 						return {id: review.id, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: priority, patient_readiness: readiness, referred: this._selectText(this.yesNoOptions, review.referred), referral_complete: this._selectText(this.yesNoOptions, review.referralComplete)};						
 					}
 				});
