@@ -60,6 +60,14 @@ class ModalEditRow {
 								<label :for="question.number">{{question.text}}</label>
 								<b-form-select disabled :id="question.number" v-model="question.answer" :options="question.answers" size="sm"></b-form-select>
 							</b-form-group>
+							<b-form-group class="wants-help-question">
+								<label>Would you like help addressing this need?</label>
+								<b-form-select disabled v-model="selectedResponse.wantsHelp" :options="yesNoLongOptions"></b-form-select>
+   							</b-form-group>
+							<b-form-group>
+								<label>Comments</label>
+								<b-form-textarea disabled v-model="selectedResponse.comments" rows="3"></b-form-textarea>
+							</b-form-group>
    						</div>
    						<div v-else>
    							None
@@ -70,6 +78,15 @@ class ModalEditRow {
 							<b-form-group v-for="question in newResponse.questions">
 								<label :for="question.number">{{question.text}}</label>
 								<b-form-select :id="question.number" v-model="question.answer" :options="question.answers" size="sm"></b-form-select>
+							</b-form-group>
+							<b-form-group class="wants-help-question">
+								<label>Would you like help addressing this need?</label>
+								<b-form-select v-model="newResponse.wantsHelp" :options="yesNoLongOptions"></b-form-select>
+							</b-form-group>
+							<b-form-group>
+								<label>Comments</label>
+								<!-- Limitations with b-form-text-area require the model to be data and not a computed property. -->
+								<b-form-textarea v-model="comments" rows="3"></b-form-textarea>
 							</b-form-group>
 							<b-button type="submit" variant="primary">Submit</b-button>
 						</b-form>
@@ -126,12 +143,14 @@ class ModalEditRow {
 	        priorityOptions: [],
 	        readinessOptions: [],
 	        yesNoOptions: [{value: true, text:'Y'}, {value: false, text:'N'}],
+	        yesNoLongOptions: [{value: true, text:'Yes'}, {value: false, text:'No'}],
 	        reviews: [],
 	        questionnaires: [],
 	        responses: [],
 	        expandedRow: {},
 	        tabIndex: 0,
 	        selectedResponseDate: null,
+	        comments: null,
 	        modalEditRow: new ModalEditRow()
 		},
 		mounted() {
@@ -317,6 +336,8 @@ class ModalEditRow {
 		    submitResponse() {
 		    	let obj = {
 		    		answerJson: JSON.stringify(this.newResponse.questions),
+		    		wantsHelp: this.newResponse.wantsHelp,
+		    		comments: this.comments,
 		    		patient: `${this.contextPath}/api/patient/${this.patient}`,
 		    		sdhDomainQuestionnaire: this.newResponse.href
 		    	}
@@ -333,6 +354,7 @@ class ModalEditRow {
 								this.responses = data._embedded.questionnaireResponses;
 								this.selectedResponseDate = this.currentResponse.createdAt;
 								this.tabIndex = 0;
+								this.comments = null;
 							}
 						});
 					}
@@ -392,7 +414,7 @@ class ModalEditRow {
 		    responsesForDomain() {
 		    	const responses = this.responses.filter(r => r.domain === this.expandedDomain);
 		    	const mapped = responses.map(r => {
-		    		return {createdAt: r.createdAt, questions: JSON.parse(r.answerJson)}
+		    		return {createdAt: r.createdAt, questions: JSON.parse(r.answerJson), wantsHelp:r.wantsHelp, comments:r.comments}
 		    	});
 		    	return mapped;
 		    },
@@ -427,7 +449,7 @@ class ModalEditRow {
 		    	const questions = JSON.parse(domainQuestionnaire[0].questionJson).questions;
 		    	// Start with blank answers for each question
 		    	questions.forEach(q => q.answer = "");
-		    	return {domain: this.expandedDomain, questions: questions, href:domainQuestionnaire[0]._links.self.href};
+		    	return {domain: this.expandedDomain, questions: questions, wantsHelp: false, href:domainQuestionnaire[0]._links.self.href};
 		    }
 		}
 	});

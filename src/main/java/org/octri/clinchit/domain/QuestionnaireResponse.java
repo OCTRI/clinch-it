@@ -30,6 +30,13 @@ public class QuestionnaireResponse extends AbstractEntity {
 	@Column(columnDefinition = "TEXT")
 	private String answerJson;
 	
+	@NotNull
+	private Boolean wantsHelp;
+
+	@Lob
+	@Column(columnDefinition = "TEXT")
+	private String comments;
+
 	public Patient getPatient() {
 		return patient;
 	}
@@ -52,6 +59,22 @@ public class QuestionnaireResponse extends AbstractEntity {
 
 	public void setAnswerJson(String answerJson) {
 		this.answerJson = answerJson;
+	}
+
+	public Boolean getWantsHelp() {
+		return wantsHelp;
+	}
+
+	public void setWantsHelp(Boolean wantsHelp) {
+		this.wantsHelp = wantsHelp;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 
 }

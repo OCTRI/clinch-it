@@ -25,6 +25,10 @@ public interface QuestionnaireResponseSummary {
 	
 	String getAnswerJson();
 	
+	Boolean getWantsHelp();
+	
+	String getComments();
+	
 }
 
 	

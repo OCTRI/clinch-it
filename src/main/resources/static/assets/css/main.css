@@ -21,6 +21,10 @@ body>.container {
 	margin-bottom: 15px;
 }
 
+.wants-help-question {
+	margin-top: 3rem;
+}
+
 .error-text {
 	color:#a94442;
 }
