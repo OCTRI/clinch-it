@@ -66,7 +66,21 @@ class ModalEditRow {
    							</b-form-group>
 							<b-form-group>
 								<label>Comments</label>
-								<b-form-textarea disabled v-model="selectedResponse.comments" rows="3"></b-form-textarea>
+								<div v-if="selectedResponseDate === currentResponse.createdAt">
+									<b-alert :show="dismissCountDown" dismissible variant="success" @dismissed="dismissCountDown=0">									
+										Comments successfully saved....
+									</b-alert>
+									<b-form @submit.stop.prevent="editComments">
+										<b-form-group>
+											<!-- Limitations with b-form-text-area require the model to be data and not a computed property. -->
+											<b-form-textarea v-model="currentComments" rows="3"></b-form-textarea>
+										</b-form-group>
+										<b-button type="submit" variant="primary">Submit</b-button>
+									</b-form>
+								</div>
+								<div v-else> 
+									<b-form-textarea readonly v-model="selectedResponse.comments" rows="3"></b-form-textarea>
+								</div>
 							</b-form-group>
    						</div>
    						<div v-else>
@@ -152,6 +166,8 @@ class ModalEditRow {
 	        tabIndex: 0,
 	        selectedResponseDate: null,
 	        comments: null,
+	        currentComments: null,
+	        dismissCountDown: 0,
 	        modalEditRow: new ModalEditRow()
 		},
 		mounted() {
@@ -355,6 +371,28 @@ class ModalEditRow {
 					}
 				});
 		    	
+		    },
+		    editComments() {
+		    	let obj = {
+			    	comments: this.currentComments,
+			    }
+				$.ajax({
+					url: `${this.contextPath}/api/questionnaire_response/${this.currentResponse.id}`,
+					method: 'PATCH',
+					data: JSON.stringify(obj),
+					contentType: 'application/json',
+					success: data => {
+						$.ajax({
+							url: `${this.contextPath}/api/questionnaire_response/search/findByPatientId?id=${this.patient}`,
+							contentType: 'application/json',
+							success: data => {
+								this.responses = data._embedded.questionnaireResponses;
+								// Trigger the dismissable element indicating a successful save
+								this.dismissCountDown = 3;
+							}
+						});
+					}
+				});
 		    }
 		},
 		watch: {
@@ -411,7 +449,7 @@ class ModalEditRow {
 		    responsesForDomain() {
 		    	const responses = this.responses.filter(r => r.domain === this.expandedDomain);
 		    	const mapped = responses.map(r => {
-		    		return {createdAt: r.createdAt, questions: JSON.parse(r.answerJson), wantsHelp:r.wantsHelp, comments:r.comments}
+		    		return {id: r.id, createdAt: r.createdAt, questions: JSON.parse(r.answerJson), wantsHelp:r.wantsHelp, comments:r.comments}
 		    	});
 		    	return mapped;
 		    },
@@ -429,6 +467,7 @@ class ModalEditRow {
 			    	const currentResponse = this.responsesForDomain.reduce(function(r1, r2) {
 	    				return r1.createdAt > r2.createdAt ? r1 : r2;
 	    			});
+			    	this.currentComments = currentResponse.comments;
 			    	return currentResponse;
 		    	}
 		    	return null;
