@@ -1,26 +1,3 @@
-class ModalEditRow {
-	
-	constructor() {
-		this.title = '';
-		this.id = null;
-		this.domain = '';
-		this.prioritySelected = '';
-		this.readinessSelected = '';
-		this.referred = '';
-		this.referralComplete = '';
-	}
-	
-	setFields(title, id, domain, prioritySelected, readinessSelected, referred, referralComplete) {
-		this.title = title;
-		this.id = id;
-		this.domain = domain;
-		this.prioritySelected = prioritySelected;
-		this.readinessSelected = readinessSelected;
-		this.referred = referred;
-		this.referralComplete = referralComplete;
-	}
-};
-
 (function() {
 	
 	const patient = $('#contents').attr('data-patient-id');
@@ -47,9 +24,44 @@ class ModalEditRow {
        	  <template slot="flagged" slot-scope="row">
        	  	<span class="flag" :class="{'flag-enabled':(row.item.flagged)}" @click="toggleFlag(row)"><i class="fas fa-exclamation-circle"></i></span>
       	  </template>
-     	  <template slot="edit" slot-scope="row">
-      	  	<i class="far fa-edit" @click="edit(row.item, row.index, $event.target)"></i>
+       	  <template slot="clinician_priority" slot-scope="row">
+      	  	<div v-if="row.index === rowToEdit">
+  				<b-form-group>
+  					<b-form-select v-model="row.item.clinician_priority" :options="priorityOptions" />
+  				</b-form-group>
+			</div>
+			<div v-else>{{row.item.clinician_priority}}</div>
       	  </template>
+      	  <template slot="patient_readiness" slot-scope="row">
+      	  	<div v-if="row.index === rowToEdit">
+  				<b-form-group>
+  					<b-form-select v-model="row.item.patient_readiness" :options="readinessOptions" />
+  				</b-form-group>
+			</div>
+			<div v-else>{{row.item.patient_readiness}}</div>
+      	  </template>
+      	  <template slot="referred" slot-scope="row">
+      	  	<div v-if="row.index === rowToEdit">
+  				<b-form-group>
+  					<b-form-select v-model="row.item.referred" :options="yesNoOptions" />
+  				</b-form-group>
+			</div>
+			<div v-else>{{_selectText(yesNoOptions, row.item.referred)}}</div>
+      	  </template>
+      	  <template slot="referral_complete" slot-scope="row">
+      	  	<div v-if="row.index === rowToEdit">
+  				<b-form-group>
+  					<b-form-select v-model="row.item.referral_complete" :options="yesNoOptions" />
+  				</b-form-group>
+			</div>
+			<div v-else>{{_selectText(yesNoOptions, row.item.referral_complete)}}</div>
+      	  </template>
+    	  <template slot="edit" slot-scope="row">
+      	  	<div v-if="row.index === rowToEdit">
+				<i class="fas fa-save fa-lg text-primary" @click="submitClinicianReview(row.item)"></i>
+			</div>
+			<div v-else><i class="far fa-edit" @click="edit(row.index)"></i></div>
+       	  </template>
 		  <template slot="row-details" slot-scope="row">
 		    <b-card class="small">
 		  	<div>
@@ -113,35 +125,6 @@ class ModalEditRow {
               </b-card>
       	   </template>
 		</b-table>
-		<!-- Modal for Creating/Editing a Clinician Review -->
-    	<b-modal id="modalEditRow" ref="modal" @hide="resetModal" :title="modalEditRow.title" @ok.prevent="submitClinicianReview">
-      		<form @submit.stop.prevent="submitClinicianReview">
-      			<b-form-group
-      				id="clinicianPriorityLabel"
-       				label="Clinician Priority"
-      				label-for="clinicianPriority">
-      			<b-form-select id="clinicianPriority" v-model="modalEditRow.prioritySelected" :options="priorityOptions" />
-      			</b-form-group>
-      			<b-form-group
-      				id="patientReadinessLabel"
-       				label="Patient Readiness"
-      				label-for="patientReadiness">
-      			<b-form-select id="patientReadiness" v-model="modalEditRow.readinessSelected" :options="readinessOptions" />
-      			</b-form-group>
-      			<b-form-group
-      				id="referredLabel"
-       				label="Referred"
-      				label-for="referred">
-      			<b-form-select id="referred" v-model="modalEditRow.referred" :options="yesNoOptions" />
-      			</b-form-group>
-      			<b-form-group
-      				id="referralCompleteLabel"
-       				label="Referral Complete"
-      				label-for="referralComplete">
-      			<b-form-select id="referralComplete" v-model="modalEditRow.referralComplete" :options="yesNoOptions" />
-      			</b-form-group>
-      		</form>
-    	</b-modal>
 		</div>
 		`,
 		data: {
@@ -155,21 +138,21 @@ class ModalEditRow {
 			      patient_readiness: ''
 			    },
 	        domainOptions: [],
-	        priorityOptions: [],
+	        priorities: [],
+	        readinesses: [],
 	        emptyOption: "---",
-	        readinessOptions: [],
 	        yesNoOptions: [{value: true, text:'Y'}, {value: false, text:'N'}],
 	        yesNoLongOptions: [{value: true, text:'Yes'}, {value: false, text:'No'}],
 	        reviews: [],
 	        questionnaires: [],
 	        responses: [],
 	        expandedRow: {},
+	        rowToEdit: null,
 	        tabIndex: 0,
 	        selectedResponseDate: null,
 	        comments: null,
 	        currentComments: null,
-	        dismissCountDown: 0,
-	        modalEditRow: new ModalEditRow()
+	        dismissCountDown: 0
 		},
 		mounted() {
 			$.ajax({
@@ -185,20 +168,20 @@ class ModalEditRow {
 				url: contextPath + '/api/clinician_priority/',
 				contentType: 'application/json',
 				success: data => {
-					this.priorityOptions = data._embedded.clinicianPriorities.map(it => {
-						return {value: it._links.self.href, text: it.description};
+					this.priorities = data._embedded.clinicianPriorities.map(it => {
+						return {href: it._links.self.href, description: it.description};
 					});
-					this.priorityOptions.unshift({value:null, text:this.emptyOption});
+					this.priorities.unshift({href:null, description:this.emptyOption});
 				}
 			});
 			$.ajax({
 				url: contextPath + '/api/patient_readiness/',
 				contentType: 'application/json',
 				success: data => {
-					this.readinessOptions = data._embedded.patientReadinesses.map(it => {
-						return {value: it._links.self.href, text: it.description}
+					this.readinesses = data._embedded.patientReadinesses.map(it => {
+						return {href: it._links.self.href, description: it.description};
 					});
-					this.readinessOptions.unshift({value:null, text:this.emptyOption});
+					this.readinesses.unshift({href:null, description:this.emptyOption});
 				}
 			});
 			$.ajax({
@@ -267,18 +250,14 @@ class ModalEditRow {
 		    	// Persistence is not currently required. Just update the display.
 		    	row.item.flagged = !row.item.flagged;
 		    },
-		    edit(item, index, target) {
-		    	const domain = this._selectValue(this.domainOptions, item.domain);
-	    		const referred = this._selectValue(this.yesNoOptions, item.referred);
-	    		const referralComplete = this._selectValue(this.yesNoOptions, item.referral_complete);
-		    	if (!item.id) {
-		    		this.modalEditRow.setFields('New Clinician Review', null, domain, '', '', referred, referralComplete);
+		    edit(index) {
+		    	// Don't allow the user to click away from a row until they've saved.
+		    	if (this.rowToEdit != null && this.rowToEdit !== index) {
+		    		alert('Click the save icon to save your changes.')
 		    	} else {
-		    		const prioritySelected = this._selectValue(this.priorityOptions, item.clinician_priority);
-		    		const readinessSelected = this._selectValue(this.readinessOptions, item.patient_readiness);
-		    		this.modalEditRow.setFields('Edit Clinical Review', item.id, domain, prioritySelected, readinessSelected, referred, referralComplete);
+			    	// Set the row that should be editable
+		    		this.rowToEdit = index;
 		    	}
-				this.$root.$emit('bv::show::modal', 'modalEditRow', target);
 		    },
 		    rowDetails(row, target) {
 		    	if (row.detailsShowing === false) {
@@ -296,18 +275,16 @@ class ModalEditRow {
 		    		row.toggleDetails();
 		    	}
 		    },
-		    resetModal() {
-		    	return new ModalEditRow();
-		    },
-		    submitClinicianReview() {
-				let clinicianReviewId = this.modalEditRow.id;
+		    submitClinicianReview(item) {
+				let clinicianReviewId = item.id;
 				let url = '';
 				let method = '';
 				let obj = {
-					clinicianPriority: this.modalEditRow.prioritySelected,
-					patientReadiness: this.modalEditRow.readinessSelected,
-					referred: this.modalEditRow.referred,
-					referralComplete: this.modalEditRow.referralComplete
+					clinicianPriority: this.priorities.filter(priority => priority.description === item.clinician_priority)[0].href,
+					patientReadiness: this.readinesses.filter(readiness => readiness.description === item.patient_readiness)[0].href,
+					referred: item.referred,
+					referralComplete: item.referral_complete,
+					flagged: item.flagged
 				};
 				if (clinicianReviewId) {
 					url = `${this.contextPath}/api/clinician_review/${clinicianReviewId}`;
@@ -316,7 +293,7 @@ class ModalEditRow {
 					url = `${this.contextPath}/api/clinician_review/`;
 					method = 'POST';
 					obj.patient = `${this.contextPath}/api/patient/${this.patient}`;
-					obj.domain = this.modalEditRow.domain;
+					obj.domain = this._selectValue(this.domainOptions, item.domain);
 				}
 				
 				$.ajax({
@@ -330,16 +307,12 @@ class ModalEditRow {
 							url: `${this.contextPath}/api/clinician_review/search/findByPatientId?id=${this.patient}`,
 							contentType: 'application/json',
 							success: data => {
+								this.rowToEdit = null;
 								this.reviews = data._embedded.clinicianReviews;
 							}
 						});
 					}
 				});
-								
-		    	this.$nextTick(() => {
-		            // Wrapped in $nextTick to ensure DOM is rendered before closing
-		            this.$refs.modal.hide();
-		        });
 		    },
 		    validateResponse() {
 		    	const blankAnswer = this.newResponse.questions.some(q => q.answer === "");
@@ -406,18 +379,28 @@ class ModalEditRow {
 			}
 		},
 		computed: {
+			priorityOptions() {
+				return this.priorities.map( priority => {
+					return {text: priority.description, value: priority.description};
+				});
+			},
+			readinessOptions() {
+				return this.readinesses.map( readiness => {
+					return {text: readiness.description, value: readiness.description};
+				});
+			},
 			clinicianReviewSummary () {				
 				return this.domainOptions.map( domain => {
 					let reviewForDomain = this.reviews.filter( review => {
 						return review.domain === domain.text;
 					});
 					if (reviewForDomain.length === 0) {
-						return {id: '', flagged: false, domain: domain.text, last_reviewed: 'NA', clinician_priority:this.emptyOption, patient_readiness: this.emptyOption, referred: this._selectText(this.yesNoOptions, false), referral_complete: this._selectText(this.yesNoOptions, false)};
+						return {id: '', flagged: false, domain: domain.text, last_reviewed: 'NA', clinician_priority:this.emptyOption, patient_readiness: this.emptyOption, referred: false, referral_complete: false};
 					} else {
 						const review = reviewForDomain[0]; // Unique constraint prevents more than one
 						const priority = review.clinicianPriority ? review.clinicianPriority.description : this.emptyOption;
 						const readiness = review.patientReadiness ? review.patientReadiness.description : this.emptyOption;
-						return {id: review.id, flagged: review.flagged, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: priority, patient_readiness: readiness, referred: this._selectText(this.yesNoOptions, review.referred), referral_complete: this._selectText(this.yesNoOptions, review.referralComplete)};						
+						return {id: review.id, flagged: review.flagged, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: priority, patient_readiness: readiness, referred: review.referred, referral_complete: review.referralComplete};						
 					}
 				});
 			},
