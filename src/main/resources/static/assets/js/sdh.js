@@ -58,7 +58,7 @@
       	  </template>
     	  <template slot="edit" slot-scope="row">
       	  	<div v-if="row.index === rowToEdit">
-				<i class="fas fa-save fa-lg" @click="submitClinicianReview(row.item)"></i>
+				<i class="fas fa-save fa-lg text-primary" @click="submitClinicianReview(row.item)"></i>
 			</div>
 			<div v-else><i class="far fa-edit" @click="edit(row.index)"></i></div>
        	  </template>
