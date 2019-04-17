@@ -251,8 +251,13 @@
 		    	row.item.flagged = !row.item.flagged;
 		    },
 		    edit(index) {
-		    	// Set the row that should display as editable
-		    	this.rowToEdit = index;
+		    	// Don't allow the user to click away from a row until they've saved.
+		    	if (this.rowToEdit != null && this.rowToEdit !== index) {
+		    		alert('Click the save icon to save your changes.')
+		    	} else {
+			    	// Set the row that should be editable
+		    		this.rowToEdit = index;
+		    	}
 		    },
 		    rowDetails(row, target) {
 		    	if (row.detailsShowing === false) {
