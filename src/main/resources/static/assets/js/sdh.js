@@ -45,7 +45,7 @@ class ModalEditRow {
         	</b-form-checkbox>
       	  </template>
        	  <template slot="flagged" slot-scope="row">
-       	  	<span :class="{'flag-enabled':(row.item.flagged), 'flag-disabled':(!row.item.flagged)}" @click="toggleFlag(row)"><i class="fas fa-exclamation-circle"></i></span>
+       	  	<span class="flag" :class="{'flag-enabled':(row.item.flagged)}" @click="toggleFlag(row)"><i class="fas fa-exclamation-circle"></i></span>
       	  </template>
      	  <template slot="edit" slot-scope="row">
       	  	<i class="far fa-edit" @click="edit(row.item, row.index, $event.target)"></i>

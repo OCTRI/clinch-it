@@ -83,12 +83,12 @@ td.table-success {
     margin-bottom: 30px;
 }
 
-.flag-enabled {
-	color: #bd3737;
+.flag {
+  color: #ced4da;
 }
 
-.flag-disabled {
-	color: #ced4da;
+.flag.flag-enabled {
+  color: #bd3737;
 }
 
 
