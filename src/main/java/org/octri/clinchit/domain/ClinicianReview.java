@@ -33,6 +33,9 @@ public class ClinicianReview extends AbstractEntity {
 	
 	@NotNull
 	private Boolean referralComplete;
+	
+	@NotNull
+	public Boolean flagged;
 
 	public Patient getPatient() {
 		return patient;
@@ -80,6 +83,14 @@ public class ClinicianReview extends AbstractEntity {
 
 	public void setReferralComplete(Boolean referralComplete) {
 		this.referralComplete = referralComplete;
+	}
+
+	public Boolean getFlagged() {
+		return flagged;
+	}
+
+	public void setFlagged(Boolean flagged) {
+		this.flagged = flagged;
 	}
 	
 }
