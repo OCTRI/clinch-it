@@ -6,15 +6,15 @@ VALUES
 	(3, 0, '2019-02-21 15:27:39', '2019-02-21 15:27:39', 'Bob Slydell', '1967-04-17');
 	
 -- Add clinician reviews for Patient 1
-INSERT INTO `clinician_review` (`id`, `version`, `created_at`, `updated_at`, `patient`, `domain`, `clinician_priority`, `patient_readiness`, `referred`, `referral_complete`)
+INSERT INTO `clinician_review` (`id`, `version`, `created_at`, `updated_at`, `patient`, `domain`, `clinician_priority`, `patient_readiness`, `referred`, `referral_complete`, `flagged`)
 VALUES
-	(1, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 1, 2, 1, 1, 0),
-	(2, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 2, 3, 2, 0, 0),
-	(3, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 3, 2, 3, 1, 1),
-	(4, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 4, 1, 3, 0, 0),
-	(5, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 5, 2, 2, 0, 0),
-	(6, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 6, 2, 1, 0, 0),
-	(7, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 7, 3, 3, 1, 0);
+	(1, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 1, 2, 3, 1, 0, 1),
+	(2, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 2, 3, 1, 0, 0, 0),
+	(3, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 3, 1, 3, 1, 0, 1),
+	(4, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 4, 2, 2, 1, 0, 0),
+	(5, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 5, 3, 1, 0, 0, 0),
+	(6, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 6, 3, 1, 0, 0, 0),
+	(7, 0, '2019-04-16 00:00:00', '2019-04-16 00:00:00', 1, 7, 1, 3, 1, 0, 1);
 	
 INSERT INTO `questionnaire_response` (`id`, `version`, `created_at`, `updated_at`, `patient`, `sdh_domain_questionnaire`, `answer_json`)
 VALUES
@@ -47,5 +47,9 @@ VALUES
 	(27, 0, '2019-04-16 08:53:02', '2019-04-16 08:53:02', 1, 6, '[{\"number\":1,\"text\":\"REALM-SF Score\",\"answers\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\"],\"answer\":\"7\"}]'),
 	(28, 0, '2019-04-16 08:53:13', '2019-04-16 08:53:13', 1, 7, '[{\"number\":1,\"text\":\"What is your current work situation?\",\"answers\":[\"Unemployed\",\"Part-time or temporary work\",\"Full-time work\",\"Otherwise unemployed but not seeking work (ex: student, retired, disabled, unpaid primary care giver)\",\"I choose not to answer this question\"],\"answer\":\"Unemployed\"},{\"number\":2,\"text\":\"What is your main insurance?\",\"answers\":[\"None/uninsured\",\"Medicaid\",\"CHIP Medicaid\",\"Medicare\",\"Other public insurance (not CHIP)\",\"Other Public Insurance (CHIP)\",\"Private Insurance\"],\"answer\":\"Medicaid\"},{\"number\":3,\"text\":\"During the past year, what was the total combined income for you and the family members you live with? This information will help us determine if you are eligible for any benefits\",\"answers\":[\"Under $20,000\",\"Between $20,000 and $40,000\",\"Between $40,000 and $60,000\",\"Over $60,000\",\"I choose not to answer this question\"],\"answer\":\"I choose not to answer this question\"}]');
 
-UPDATE `questionnaire_response` SET `comments` = 'This response has a comment.' where id in (1, 3, 6, 9, 13, 17, 19, 20, 24, 28);
+UPDATE `questionnaire_response` SET `wants_help`=1, `comments` = 'Peter states that because he lost his construction job, he is unable to afford his rent and has been living in his van as a result.' where id = 17;
+UPDATE `questionnaire_response` SET `comments`= 'Peter states that he is trying to get disability benefits, and doesn’t feel he needs or would benefit from a referral regarding his financial strain.' where id = 21;
+UPDATE `questionnaire_response` SET `wants_help`=1 where id = 22;
+UPDATE `questionnaire_response` SET `wants_help`=1 where id = 25;
+UPDATE `questionnaire_response` SET `wants_help`=1 where id = 28;
 

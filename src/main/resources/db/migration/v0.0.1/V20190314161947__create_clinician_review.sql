@@ -11,6 +11,7 @@ CREATE TABLE `clinician_review` (
 	`patient_readiness` bigint(20),
 	`referred` bit(1) NOT NULL,
 	`referral_complete` bit(1) NOT NULL,
+	`flagged` bit(1) NOT NULL DEFAULT 0,
 	primary key(`id`),
 	CONSTRAINT clinician_review_patient_fk FOREIGN KEY (`patient`) REFERENCES `patient` (`id`),
 	CONSTRAINT clinician_review_domain_fk FOREIGN KEY (`domain`) REFERENCES `sdh_domain` (`id`),
