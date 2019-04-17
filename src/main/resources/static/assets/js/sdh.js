@@ -44,7 +44,10 @@ class ModalEditRow {
         	<i class="fas fa-angle-right"></i>
         	</b-form-checkbox>
       	  </template>
-      	  <template slot="edit" slot-scope="row">
+       	  <template slot="flagged" slot-scope="row">
+       	  	<span class="flag" :class="{'flag-enabled':(row.item.flagged)}" @click="toggleFlag(row)"><i class="fas fa-exclamation-circle"></i></span>
+      	  </template>
+     	  <template slot="edit" slot-scope="row">
       	  	<i class="far fa-edit" @click="edit(row.item, row.index, $event.target)"></i>
       	  </template>
 		  <template slot="row-details" slot-scope="row">
@@ -144,14 +147,12 @@ class ModalEditRow {
 		data: {
 			patient,
 			contextPath,
-			fields: [ {key:'show_details', label:' ', headerTitle: 'Show Details', sortable:false}, {key:'domain', sortable:true}, {key:'last_reviewed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}, {key:'referred', sortable:true}, {key:'referral_complete', sortable:true}, {key:'edit', label:' ', headerTitle: 'Edit', sortable:false}],
+			fields: [ {key:'show_details', label:' ', headerTitle: 'Show Details', sortable:false}, {key:'flagged', label:' ', headerTitle: 'Flagged', sortable:false}, {key:'domain', sortable:true}, {key:'last_reviewed', sortable:true}, {key:'clinician_priority', sortable:true}, {key:'patient_readiness', sortable:true}, {key:'referred', sortable:true}, {key:'referral_complete', sortable:true}, {key:'edit', label:' ', headerTitle: 'Edit', sortable:false}],
 			filters: {
 			      domain: '',
 			      last_reviewed: '',
 			      clinician_priority: '',
-			      patient_readiness: '',
-			      referred: '',
-			      referral_complete: ''
+			      patient_readiness: ''
 			    },
 	        domainOptions: [],
 	        priorityOptions: [],
@@ -249,7 +250,7 @@ class ModalEditRow {
 		    	return field.key === 'show_details';
 		    },
 		    _isUnfiltered(field) {
-		    	return field.key === 'edit' || field.key === 'referred' || field.key === 'referral_complete';
+		    	return field.key === 'edit' || field.key === 'referred' || field.key === 'referral_complete' || field.key === 'flagged';
 		    },
 		    _formatDate(dateString) {
 		    	return dateString.replace(/ \d\d:\d\d:\d\d\.\d/, '');
@@ -261,7 +262,11 @@ class ModalEditRow {
 		    _selectText(options, valueTarget) {
 		    	// Find the select item by value and return the text
 		    	return options.filter(it => it.value === valueTarget)[0].text;
-		    },	
+		    },
+		    toggleFlag(row) {
+		    	// Persistence is not currently required. Just update the display.
+		    	row.item.flagged = !row.item.flagged;
+		    },
 		    edit(item, index, target) {
 		    	const domain = this._selectValue(this.domainOptions, item.domain);
 	    		const referred = this._selectValue(this.yesNoOptions, item.referred);
@@ -407,12 +412,12 @@ class ModalEditRow {
 						return review.domain === domain.text;
 					});
 					if (reviewForDomain.length === 0) {
-						return {id: '', domain: domain.text, last_reviewed: 'NA', clinician_priority:this.emptyOption, patient_readiness: this.emptyOption, referred: this._selectText(this.yesNoOptions, false), referral_complete: this._selectText(this.yesNoOptions, false)};
+						return {id: '', flagged: false, domain: domain.text, last_reviewed: 'NA', clinician_priority:this.emptyOption, patient_readiness: this.emptyOption, referred: this._selectText(this.yesNoOptions, false), referral_complete: this._selectText(this.yesNoOptions, false)};
 					} else {
 						const review = reviewForDomain[0]; // Unique constraint prevents more than one
 						const priority = review.clinicianPriority ? review.clinicianPriority.description : this.emptyOption;
 						const readiness = review.patientReadiness ? review.patientReadiness.description : this.emptyOption;
-						return {id: review.id, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: priority, patient_readiness: readiness, referred: this._selectText(this.yesNoOptions, review.referred), referral_complete: this._selectText(this.yesNoOptions, review.referralComplete)};						
+						return {id: review.id, flagged: review.flagged, domain: domain.text, last_reviewed: this._formatDate(review.updatedAt), clinician_priority: priority, patient_readiness: readiness, referred: this._selectText(this.yesNoOptions, review.referred), referral_complete: this._selectText(this.yesNoOptions, review.referralComplete)};						
 					}
 				});
 			},
@@ -425,9 +430,7 @@ class ModalEditRow {
 		          domain: '',
 			      last_reviewed: '',
 		          clinician_priority: '',
-		          patient_readiness: '',
-		          referred: '',
-		          referral_complete: ''
+		          patient_readiness: ''
 		        }];
 		    },
 		    emphasized () {

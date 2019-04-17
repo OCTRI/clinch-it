@@ -34,6 +34,8 @@ public interface ClinicianReviewSummary {
 	Boolean getReferred();
 	
 	Boolean getReferralComplete();
+	
+	Boolean getFlagged();
 }
 
 	
