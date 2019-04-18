@@ -373,11 +373,6 @@
 				});
 		    }
 		},
-		watch: {
-			selectedResponseDate: function(newDate, oldDate) {
-				// This triggers the UI to update the selectedResponse
-			}
-		},
 		computed: {
 			priorityOptions() {
 				return this.priorities.map( priority => {
