@@ -14,3 +14,16 @@ services:
       - "${APP_PORT}:8080"
     volumes:
       - ./app.jar:/app.jar
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql/clinch-it?serverTimezone=America/Los_Angeles
+      - SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT=30000
+  # NOTE: No data volume; database will recreated each time the application restarts
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "${MYSQL_PORT}:3306"
+    environment:
+      - TZ=America/Los_Angeles
+      - MYSQL_DATABASE=clinch-it
+      - MYSQL_USER=clinch-it
+      - MYSQL_PASSWORD=clinch-it
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
