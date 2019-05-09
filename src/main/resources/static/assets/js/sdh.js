@@ -22,7 +22,7 @@
         	</b-form-checkbox>
       	  </template>
        	  <template slot="flagged" slot-scope="row">
-       	  	<span class="flag" :class="{'flag-enabled':(row.item.flagged)}" @click="toggleFlag(row)"><i class="fas fa-exclamation-circle"></i></span>
+       	  	<span v-if="row.item.flagged" class="flag flag-enabled"><i class="fas fa-exclamation-circle"></i></span>
       	  </template>
        	  <template slot="clinician_priority" slot-scope="row">
       	  	<div v-if="row.index === rowToEdit">

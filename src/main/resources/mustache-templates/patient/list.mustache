@@ -17,7 +17,7 @@
 		<tr>
 			<td>{{#name}}{{.}}{{/name}}</th>
 			<td>{{#dateOfBirth}}{{.}}{{/dateOfBirth}}</th>
-			<td>{{>components/list_actions}}</td>
+			<td><a href='{{req.contextPath}}{{baseRoute}}/{{id}}/sdh'>View/Edit</a></td>
 		</tr>
 		{{/entity_list}}
 		</tbody>
